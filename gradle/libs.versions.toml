@@ -1,0 +1,20 @@
+[versions]
+junit5 = "5.10.1"
+kotest = "5.8.0"
+launcher = "1.10.1"
+plugin-versions = "0.49.0"
+plugin-versionsFilter = "0.1.16"
+plugin-versionsUpdate = "0.8.1"
+serialization = "1.6.0"
+
+[libraries]
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "launcher" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+
+[plugins]
+versions = { id = "com.github.ben-manes.versions", version.ref = "plugin-versions" }
+versions-filter = { id = "se.ascp.gradle.gradle-versions-filter", version.ref = "plugin-versionsFilter" }
+versions-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "plugin-versionsUpdate" }
