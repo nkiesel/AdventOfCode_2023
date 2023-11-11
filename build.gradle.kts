@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.versions.update)
 }
 
-group = "easy-apply.internal"
 version = "2023"
 
 repositories {
