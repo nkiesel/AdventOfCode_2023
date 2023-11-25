@@ -13,10 +13,9 @@ repositories {
 
 dependencies {
     testImplementation(libs.kotest.assertions.core)
-    implementation(libs.junit.jupiter.api)
+    testImplementation(platform(libs.junit.bom))
+    implementation(libs.junit.jupiter)
     implementation(libs.kotlin.serialization)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {

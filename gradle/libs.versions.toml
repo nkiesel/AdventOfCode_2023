@@ -1,16 +1,14 @@
 [versions]
 junit5 = "5.10.1"
 kotest = "5.8.0"
-launcher = "1.10.1"
 plugin-versions = "0.50.0"
 plugin-versionsFilter = "0.1.16"
 plugin-versionsUpdate = "0.8.1"
 serialization = "1.6.1"
 
 [libraries]
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "launcher" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit5" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
