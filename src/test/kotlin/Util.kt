@@ -108,6 +108,9 @@ fun manhattanDistance(x1: Long, y1: Long, z1: Long, x2: Long, y2: Long, z2: Long
 
 fun manhattanDistance(p1: LongArray, p2: LongArray) = p1.zip(p2).sumOf { (it.first - it.second).absoluteValue }
 
+/**
+ * The size of a power-set of a set of size n is 2.0.pow(n)
+ */
 fun <T> Collection<T>.powerSet(): Set<Set<T>> = powerSet(this, setOf(emptySet()))
 
 private tailrec fun <T> powerSet(left: Collection<T>, acc: Set<Set<T>>): Set<Set<T>> {
@@ -115,6 +118,20 @@ private tailrec fun <T> powerSet(left: Collection<T>, acc: Set<Set<T>>): Set<Set
         acc
     } else {
         powerSet(left.drop(1), acc + acc.map { it + left.first() })
+    }
+}
+
+/**
+ * The size of a power-set of a set of size n is 2.0.pow(n)
+ */
+fun <T> Collection<T>.powerSetSeq(): Sequence<Set<T>> {
+    return sequence {
+        val powerSet = mutableSetOf<Set<T>>(emptySet())
+        yield(powerSet.first())
+        for (element in this@powerSetSeq) {
+            val newSubsets = powerSet.map { s -> (s + element).also { yield(it) } }
+            powerSet.addAll(newSubsets)
+        }
     }
 }
 

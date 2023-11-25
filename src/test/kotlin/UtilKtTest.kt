@@ -1,16 +1,44 @@
-import kotlin.math.max
-import kotlin.math.min
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.junit.platform.commons.util.ClassLoaderUtils
+import java.net.URL
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.time.measureTime
+import kotlin.time.measureTimedValue
+
 
 internal class UtilKtTest {
     @Test
+    fun classLoader() {
+        val classLoader = ClassLoaderUtils.getDefaultClassLoader()
+        val resources: List<URL> = classLoader.getResources("junit-platform.properties").toList()
+        println(resources)
+    }
+
+    @Test
     fun powerSet() {
         val s = setOf("A", "B", "C")
-        val ps = s.powerSet().filter { it.size != 0 && it.size != s.size }
-        val pss = ps.asSequence().map { it to (s - it) }
+        val ps = s.powerSet().filter { it.isNotEmpty() && it.size != s.size }
+        val pss = ps.map { it to (s - it) }
+        pss shouldHaveSize 6
+        println(pss)
+        println(2.0.pow(16).toInt())
+        val sn = (1..16).toSet()
+        println(sn)
+        println(measureTimedValue { sn.powerSet().size })
+        println(measureTimedValue { sn.powerSetSeq().count() })
+    }
+
+    @Test
+    fun powerSetSeq() {
+        val s = setOf("A", "B", "C")
+        val ps1 = s.powerSetSeq().toList()
+        val ps2 = s.powerSet().toList()
+        ps1 shouldBe ps2
     }
 
     @Test
@@ -125,5 +153,13 @@ internal class UtilKtTest {
         listOf(3, 1, 4).reduce(::min) shouldBe 1
         listOf(3, 1, 4).reduce(::max) shouldBe 4
         listOf(3, 1, 4).multiReduce(::min, ::max) shouldBe listOf(1, 4)
+    }
+
+    @Test
+    fun manhattanDistance() {
+        manhattanDistance(0, 0, 2, 2) shouldBe 4
+        manhattanDistance(0, 0, 0, 2, 2, 2) shouldBe 6
+        manhattanDistance(intArrayOf(0, 0), intArrayOf(1, 2)) shouldBe 3
+        manhattanDistance(longArrayOf(0L, 0L), longArrayOf(1L, 2L)) shouldBe 3L
     }
 }
