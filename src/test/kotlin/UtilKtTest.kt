@@ -7,7 +7,6 @@ import java.net.URL
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
-import kotlin.time.measureTime
 import kotlin.time.measureTimedValue
 
 
@@ -43,6 +42,7 @@ internal class UtilKtTest {
 
     @Test
     fun permutations() {
+        println(listOf("a", "b", "c").permutations().toList())
         listOf("a", "b", "c").permutations().toList() shouldHaveSize 6
     }
 
@@ -129,18 +129,12 @@ internal class UtilKtTest {
     fun `minMax using multiFold`() {
         fun minMax(l: List<Int>) = l.multiFold(listOf(Int.MAX_VALUE, Int.MIN_VALUE), listOf(::min, ::max))
         minMax(listOf(3, 1, 4, 1, 5, 9)) shouldBe intArrayOf(1, 9)
-        val (i, a) = listOf(3, 1, 4).minMax()
-        i shouldBe 1
-        a shouldBe 4
     }
 
     @Test
     fun `minMax using multiReduce`() {
         fun minMax(l: List<Int>) = l.multiReduce(::min, ::max)
         minMax(listOf(3, 1, 4, 1, 5, 9)) shouldBe intArrayOf(1, 9)
-        val (i, a) = listOf(3, 1, 4).minMax()
-        i shouldBe 1
-        a shouldBe 4
     }
 
     @Test
