@@ -4,7 +4,7 @@ kotest = "5.8.0"
 plugin-versions = "0.50.0"
 plugin-versionsFilter = "0.1.16"
 plugin-versionsUpdate = "0.8.1"
-serialization = "1.6.1"
+serialization = "1.6.2"
 
 [libraries]
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit5" }
