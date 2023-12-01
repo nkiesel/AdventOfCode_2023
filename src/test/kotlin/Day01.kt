@@ -31,6 +31,14 @@ class Day01 {
         two(input) shouldBe 53268
     }
 
+    @Test
+    fun testThree(input: List<String>) {
+        three(sample1, false) shouldBe 142
+        three(sample2, true) shouldBe 281
+        three(input, false) shouldBe 53080
+        three(input, true) shouldBe 53268
+    }
+
     private fun one(input: List<String>): Int {
         return input.sumOf { line -> line.mapNotNull { it.digitToIntOrNull() }.let { it.first() * 10 + it.last() } }
     }
@@ -63,6 +71,22 @@ class Day01 {
                 }
             }
         }
+    }
+
+    private fun three(input: List<String>, withLetters: Boolean): Int {
+        val map = (1..9).associateBy { it.toString() }.toMutableMap()
+        if (withLetters) map += mapOf(
+            "one" to 1, "two" to 2, "three" to 3, "four" to 4, "five" to 5,
+            "six" to 6, "seven" to 7, "eight" to 8, "nine" to 9
+        )
+        val pattern = map.keys.joinToString("|").toRegex()
+        fun calibration(line: String): Int {
+            fun IntProgression.digit() = firstNotNullOf { i -> pattern.find(line, i)?.let { map[it.value]!! } }
+            val first = line.indices.digit()
+            val last = line.indices.reversed().digit()
+            return first * 10 + last
+        }
+        return input.sumOf { calibration(it) }
     }
 }
 
