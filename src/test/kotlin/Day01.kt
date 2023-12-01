@@ -59,10 +59,7 @@ class Day01 {
                 if (d != null) {
                     add(d)
                 } else {
-                    val m = pattern.find(line.substring(i))
-                    if (m != null) {
-                        add(map[m.value]!!)
-                    }
+                    pattern.find(line.substring(i))?.let { add(map[it.value]!!) }
                 }
             }
         }
@@ -73,6 +70,10 @@ class Day01 {
  * This was a bit more complicated than I expected for day 1.  The one a bit weird point about part 2 is that a line
  * "3oneight" should be converted to [3, 1, 8] although the 'e' is then used by 2 spelled digits.  I initially moved the
  * index beyond the mapped input part (which resulted in [3, 1]), but that created the wrong answer.
+ *
+ * After thinking a bit more about that, I now realize that my "convert to number list" was the cause of this issue: the
+ * puzzle explicitly asked for the last digit, and thus the 'e' does belong to the "eight" and it does not matter that
+ * it could also belong to the one.  I guess the only issue would be an input of "oneeight": should that be a [1, 8]?
  *
  * Another surprising point was that `Regex.find(input, index)` does not work with the pattern starting with an '^'. Thus,
  * I had to switch to `Regex.find(input.substring(index))`.
