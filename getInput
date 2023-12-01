@@ -13,4 +13,4 @@ day="input/Day${od}.txt"
 # site, then copy the session cookie value from the "Storage" tab of "Web Developer Tools" into the session file. The
 # session file should be located at ~/.httpie/sessions/adventofcode.com/2023.json
 https --download --quiet --output $day --session-read-only=2023 \
-"https://adventofcode.com/2023/day/$id/input" && git add $day
+"https://adventofcode.com/2023/day/$id/input"
