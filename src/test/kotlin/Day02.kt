@@ -1,6 +1,5 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 
 class Day02 {
     private val sample = """
@@ -29,13 +28,11 @@ class Day02 {
     }
 
     class Game(val id: Int, val reveals: List<Reveal>) {
-        fun power() = reveals.reduce { acc, p ->
-            Reveal(
-                red = max(acc.red, p.red),
-                green = max(acc.green, p.green),
-                blue = max(acc.blue, p.blue),
-            )
-        }.power
+        fun power() = Reveal(
+            red = reveals.maxOf { it.red },
+            green = reveals.maxOf { it.green },
+            blue = reveals.maxOf { it.blue }
+        ).power
     }
 
     private fun parse(input: List<String>): List<Game> {
@@ -45,8 +42,8 @@ class Day02 {
         fun cubes(line: String, re: Regex) = re.find(line)?.groupValues?.get(1)?.toInt() ?: 0
 
         return input.map { line ->
-            val record = line.split(Regex("[:;]"))
-            val id = record.removeFirst().split(" ")[1].toInt()
+            val record = line.split(";", ":")
+            val id = record.removeFirst().substringAfter(" ").toInt()
             val reveals = record.map {
                 Reveal(red = cubes(it, red), green = cubes(it, green), blue = cubes(it, blue))
             }
