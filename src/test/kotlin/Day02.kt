@@ -1,5 +1,7 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import java.awt.Color.blue
+import java.awt.Color.green
 
 class Day02 {
     private val sample = """
@@ -23,16 +25,11 @@ class Day02 {
     }
 
     class Reveal(val red: Int, val green: Int, val blue: Int) {
-        val power = red * green * blue
         fun possible(game: Game) = game.reveals.all { it.red <= red && it.green <= green && it.blue <= blue }
     }
 
     class Game(val id: Int, val reveals: List<Reveal>) {
-        fun power() = Reveal(
-            red = reveals.maxOf { it.red },
-            green = reveals.maxOf { it.green },
-            blue = reveals.maxOf { it.blue }
-        ).power
+        fun power() = reveals.maxOf { it.red } * reveals.maxOf { it.green } * reveals.maxOf { it.blue }
     }
 
     private fun parse(input: List<String>): List<Game> {
