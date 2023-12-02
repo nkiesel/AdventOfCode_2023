@@ -1,7 +1,5 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.awt.Color.blue
-import java.awt.Color.green
 
 class Day02 {
     private val sample = """
