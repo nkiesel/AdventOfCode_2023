@@ -27,7 +27,7 @@ class Day03 {
         two(input) shouldBe 91031374
     }
 
-    class PartNumber(var value: Int, var active: Boolean = true)
+    class PartNumber(val value: Int, var active: Boolean)
 
     private fun parse(input: List<String>): Array<Array<PartNumber>> {
         val parts = Array(input.size) { Array(input[0].length) { PartNumber(0, false) } }
@@ -83,4 +83,8 @@ of a cell in a 2-dimensional array, honoring the array dimensions.
 
 After creating the solution in Typescript I realized that assuming part numbers to never be 0 was not guaranteed, so
 added an "active" flag to the MutableInt class.
+
+Looking at it again after a while, it becomes clear that there was no need for a full parts map. Instead, a sparse map
+(using e.g. a Set of parts, each part containing the range of y coordinates to cover) would have been more efficient.
+But not changing this, it's early in AoC and full maps still work.
 */
