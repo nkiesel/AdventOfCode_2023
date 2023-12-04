@@ -27,13 +27,13 @@ class Day03 {
         two(input) shouldBe 91031374
     }
 
-    class MutableInt(var value: Int)
+    class PartNumber(var value: Int, var active: Boolean = true)
 
-    private fun parse(input: List<String>): Array<Array<MutableInt>> {
-        val parts = Array(input.size) { Array(input[0].length) { MutableInt(0) } }
+    private fun parse(input: List<String>): Array<Array<PartNumber>> {
+        val parts = Array(input.size) { Array(input[0].length) { PartNumber(0, false) } }
         input.forEachIndexed { y, row ->
             Regex("""\d+""").findAll(row).forEach {m ->
-                val num = MutableInt(m.value.toInt())
+                val num = PartNumber(m.value.toInt(), true)
                 m.range.forEach { parts[y][it] = num }
             }
         }
@@ -46,9 +46,9 @@ class Day03 {
         input.forEachIndexed { y, row ->
             Regex("""[^\d.]""").findAll(row).forEach { m ->
                 val x = m.range.first
-                val nums = parts.neighbors8(x, y).map { (px, py) -> parts[py][px] }.filter { it.value != 0 }.toSet()
+                val nums = parts.neighbors8(x, y).map { (px, py) -> parts[py][px] }.filter { it.active }.toSet()
                 total += nums.sumOf { it.value }
-                nums.forEach { it.value = 0 }
+                nums.forEach { it.active = false }
             }
         }
         return total
@@ -60,10 +60,11 @@ class Day03 {
         input.forEachIndexed { y, row ->
             Regex("""\*""").findAll(row).forEach { m ->
                 val x = m.range.first
-                val nums = parts.neighbors8(x, y).map { (px, py) -> parts[py][px] }.filter { it.value != 0 }.toSet()
+                val nums = parts.neighbors8(x, y).map { (px, py) -> parts[py][px] }.filter { it.active }.toSet()
                 if (nums.size == 2) {
                     total += nums.map { it.value }.reduce(Int::times)
-                    nums.forEach { it.value = 0 }
+                    // do not deactivate part numbers, because `...12*34*56...` looks like a valid input where
+                    // `34` is used for 2 gears.
                 }
             }
         }
@@ -79,4 +80,7 @@ updating the value contained in the object automatically updates all the copies.
 
 Another re-use was the "neighbors8" (from Util), which is a simple method that returns the coordinates of all 8 neighbors
 of a cell in a 2-dimensional array, honoring the array dimensions.
+
+After creating the solution in Typescript I realized that assuming part numbers to never be 0 was not guaranteed, so
+added an "active" flag to the MutableInt class.
 */
