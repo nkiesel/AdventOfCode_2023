@@ -209,3 +209,6 @@ fun Collection<Int>.multiReduce(vararg transformers: (Int, Int) -> Int): List<In
     val start = first().let { f -> List(transformers.size) { f } }
     return drop(1).fold(start) { acc, i -> acc.mapIndexed { index, a -> transformers[index](i, a) } }
 }
+
+fun String.ints() = Regex("""\d+""").findAll(this).map { it.value.toInt() }.toList()
+fun String.longs() = Regex("""\d+""").findAll(this).map { it.value.toLong() }.toList()
