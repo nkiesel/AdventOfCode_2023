@@ -4,14 +4,6 @@ import org.junit.jupiter.api.Test
 class Day {
     private val sample = """""".trimIndent().lines()
 
-    private fun one(input: List<String>): Int {
-        return 0
-    }
-
-    private fun two(input: List<String>): Int {
-        return 0
-    }
-
     @Test
     fun testOne(input: List<String>) {
         one(sample) shouldBe 0
@@ -22,5 +14,13 @@ class Day {
     fun testTwo(input: List<String>) {
 //        two(sample) shouldBe 0
 //        two(input) shouldBe 0
+    }
+
+    private fun one(input: List<String>): Int {
+        return 0
+    }
+
+    private fun two(input: List<String>): Int {
+        return 0
     }
 }
