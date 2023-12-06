@@ -1,6 +1,5 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.lang.StringTemplate.combine
 import kotlin.math.min
 
 class Day05 {
@@ -40,30 +39,20 @@ class Day05 {
         56 93 4
     """.trimIndent().lines()
 
-    class Transformation(val sourceRange: LongRange, val offset: Long) {
-        constructor(destination: Long, source: Long, length: Long): this(source..< source + length, source - destination)
+    class Transformation(private val sourceRange: LongRange, private val offset: Long) {
+        constructor(destination: Long, source: Long, length: Long) : this(
+            source..< source + length,
+            source - destination
+        )
+
         fun transform(value: Long): Long? {
             return if (value in sourceRange) value - offset else null
         }
     }
 
-    class Mapping(transformations: List<Transformation>) {
-        private val combined = transformations
-
+    class Mapping(private val transformations: List<Transformation>) {
         fun transform(value: Long): Long {
-            return combined.firstNotNullOfOrNull { it.transform(value) } ?: value
-        }
-
-        private fun combine(t: List<Transformation>) : List<Transformation> {
-            val sorted = t.sortedBy { it.sourceRange.first }
-            return buildList {
-                val s = sorted[0].sourceRange.first
-                val l = sorted[0].sourceRange.last
-                for (i in 1..sorted.lastIndex) {
-                    if (sorted[i].sourceRange.first > l + 1) {
-                    }
-                }
-            }
+            return transformations.firstNotNullOfOrNull { it.transform(value) } ?: value
         }
     }
 
@@ -92,8 +81,8 @@ class Day05 {
     }
 
     private fun two(input: List<String>): Long {
-        val seeds = input[0].longs().chunked(2).map { it[0] ..< it[0] + it[1] }
-        println("${seeds.size} seed ranges with ${seeds.sumOf { it.last - it.first + 1}} values")
+        val seeds = input[0].longs().chunked(2).map { it[0]..<it[0] + it[1] }
+        println("${seeds.size} seed ranges with ${seeds.sumOf { it.last - it.first + 1 }} values")
         val mappings = parse(input)
         var minValue = Long.MAX_VALUE
         seeds.forEachIndexed { index, seedRange ->
