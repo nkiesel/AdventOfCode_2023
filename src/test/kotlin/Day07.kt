@@ -15,32 +15,38 @@ class Day07 {
     }
 
     class Hand(private val hand: String, val bid: Int, private val joker: Boolean) : Comparable<Hand> {
-        private val cards = (if (joker) hand.filterNot { it == 'J' } else hand).groupingBy { it }.eachCount()
+        private val grouped =
+            (if (joker) hand.filterNot { it == 'J' } else hand).groupingBy { it }.eachCount().values.sorted().reversed()
+                .joinToString("")
         private val jokers = if (joker) hand.count { it == 'J' } else 0
-        private val type = if (cards.size == 1) Type.FIVE_OF_A_KIND else when (jokers) {
+        private val type = when (jokers) {
             5, 4 -> Type.FIVE_OF_A_KIND
+            3 -> when (grouped) {
+                "2" -> Type.FIVE_OF_A_KIND
+                else -> Type.FOUR_OF_A_KIND
+            }
 
-            3 -> Type.FOUR_OF_A_KIND
-
-            2 -> when {
-                cards.size == 2 -> Type.FOUR_OF_A_KIND
+            2 -> when (grouped) {
+                "3" -> Type.FIVE_OF_A_KIND
+                "21" -> Type.FOUR_OF_A_KIND
                 else -> Type.THREE_OF_A_KIND
             }
 
-            1 -> when {
-                cards.any { it.value == 3 } -> Type.FOUR_OF_A_KIND
-                cards.size == 2 -> Type.FULL_HOUSE
-                cards.any { it.value == 2 } -> Type.THREE_OF_A_KIND
-                cards.size == 3 -> Type.TWO_PAIRS
+            1 -> when (grouped) {
+                "4" -> Type.FIVE_OF_A_KIND
+                "31" -> Type.FOUR_OF_A_KIND
+                "22" -> Type.FULL_HOUSE
+                "211" -> Type.THREE_OF_A_KIND
                 else -> Type.ONE_PAIR
             }
 
-            else -> when {
-                cards.any { it.value == 4 } -> Type.FOUR_OF_A_KIND
-                cards.size == 2 -> Type.FULL_HOUSE
-                cards.any { it.value == 3 } -> Type.THREE_OF_A_KIND
-                cards.count { it.value == 2 } == 2 -> Type.TWO_PAIRS
-                cards.size == 4 -> Type.ONE_PAIR
+            else -> when (grouped) {
+                "5" -> Type.FIVE_OF_A_KIND
+                "41" -> Type.FOUR_OF_A_KIND
+                "32" -> Type.FULL_HOUSE
+                "311" -> Type.THREE_OF_A_KIND
+                "221" -> Type.TWO_PAIRS
+                "2111" -> Type.ONE_PAIR
                 else -> Type.HIGH_CARD
             }
         }
