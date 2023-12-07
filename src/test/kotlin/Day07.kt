@@ -11,41 +11,35 @@ class Day07 {
     """.trimIndent().lines()
 
     enum class Type {
-        HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, FULL_HOUSE, FOUR_OF_A_KIND, FIVE_OF_A_KIND
+        HIGH_CARD, ONE_PAIR, TWO_PAIRS, THREE_OF_A_KIND, FULL_HOUSE, FOUR_OF_A_KIND, FIVE_OF_A_KIND
     }
 
     class Hand(private val hand: String, val bid: Int, private val joker: Boolean) : Comparable<Hand> {
         private val cards = (if (joker) hand.filterNot { it == 'J' } else hand).groupingBy { it }.eachCount()
         private val jokers = if (joker) hand.count { it == 'J' } else 0
-        private val type = when (jokers) {
-            5 -> Type.FIVE_OF_A_KIND
-            4 -> Type.FIVE_OF_A_KIND
-            3 -> when {
-                cards.size == 1 -> Type.FIVE_OF_A_KIND
-                else -> Type.FOUR_OF_A_KIND
-            }
+        private val type = if (cards.size == 1) Type.FIVE_OF_A_KIND else when (jokers) {
+            5, 4 -> Type.FIVE_OF_A_KIND
+
+            3 -> Type.FOUR_OF_A_KIND
 
             2 -> when {
-                cards.size == 1 -> Type.FIVE_OF_A_KIND
                 cards.size == 2 -> Type.FOUR_OF_A_KIND
                 else -> Type.THREE_OF_A_KIND
             }
 
             1 -> when {
-                cards.size == 1 -> Type.FIVE_OF_A_KIND
                 cards.any { it.value == 3 } -> Type.FOUR_OF_A_KIND
                 cards.size == 2 -> Type.FULL_HOUSE
                 cards.any { it.value == 2 } -> Type.THREE_OF_A_KIND
-                cards.size == 3 -> Type.TWO_PAIR
+                cards.size == 3 -> Type.TWO_PAIRS
                 else -> Type.ONE_PAIR
             }
 
             else -> when {
-                cards.size == 1 -> Type.FIVE_OF_A_KIND
                 cards.any { it.value == 4 } -> Type.FOUR_OF_A_KIND
                 cards.size == 2 -> Type.FULL_HOUSE
                 cards.any { it.value == 3 } -> Type.THREE_OF_A_KIND
-                cards.count { it.value == 2 } == 2 -> Type.TWO_PAIR
+                cards.count { it.value == 2 } == 2 -> Type.TWO_PAIRS
                 cards.size == 4 -> Type.ONE_PAIR
                 else -> Type.HIGH_CARD
             }
@@ -56,6 +50,7 @@ class Day07 {
             if (c != 0) return c
             val order = if (joker) "AKQT98765432J" else "AKQJT98765432"
             return hand.withIndex().firstNotNullOfOrNull { (i, h) ->
+                // comparing in reversed order because order constant is descending
                 (order.indexOf(other.hand[i]) compareTo order.indexOf(h)).takeIf { it != 0 }
             } ?: 0
         }
