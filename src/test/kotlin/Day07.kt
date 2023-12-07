@@ -15,64 +15,62 @@ class Day07 {
     }
 
     class Hand(private val hand: String, val bid: Int, private val joker: Boolean) : Comparable<Hand> {
-        private val grouped =
-            (if (joker) hand.filterNot { it == 'J' } else hand).groupingBy { it }.eachCount().values.sorted().reversed()
-                .joinToString("")
-        private val jokers = if (joker) hand.count { it == 'J' } else 0
-        private val type = when (jokers) {
-            5, 4 -> Type.FIVE_OF_A_KIND
-            3 -> when (grouped) {
-                "2" -> Type.FIVE_OF_A_KIND
-                else -> Type.FOUR_OF_A_KIND
-            }
+        private val type = run {
+            val grouped =
+                (if (joker) hand.filterNot { it == 'J' } else hand).groupingBy { it }.eachCount().values.sorted().reversed()
+                    .joinToString("")
+            val jokers = if (joker) hand.count { it == 'J' } else 0
 
-            2 -> when (grouped) {
-                "3" -> Type.FIVE_OF_A_KIND
-                "21" -> Type.FOUR_OF_A_KIND
-                else -> Type.THREE_OF_A_KIND
-            }
+            when (jokers) {
+                5, 4 -> Type.FIVE_OF_A_KIND
+                3 -> when (grouped) {
+                    "2" -> Type.FIVE_OF_A_KIND
+                    else -> Type.FOUR_OF_A_KIND
+                }
 
-            1 -> when (grouped) {
-                "4" -> Type.FIVE_OF_A_KIND
-                "31" -> Type.FOUR_OF_A_KIND
-                "22" -> Type.FULL_HOUSE
-                "211" -> Type.THREE_OF_A_KIND
-                else -> Type.ONE_PAIR
-            }
+                2 -> when (grouped) {
+                    "3" -> Type.FIVE_OF_A_KIND
+                    "21" -> Type.FOUR_OF_A_KIND
+                    else -> Type.THREE_OF_A_KIND
+                }
 
-            else -> when (grouped) {
-                "5" -> Type.FIVE_OF_A_KIND
-                "41" -> Type.FOUR_OF_A_KIND
-                "32" -> Type.FULL_HOUSE
-                "311" -> Type.THREE_OF_A_KIND
-                "221" -> Type.TWO_PAIRS
-                "2111" -> Type.ONE_PAIR
-                else -> Type.HIGH_CARD
+                1 -> when (grouped) {
+                    "4" -> Type.FIVE_OF_A_KIND
+                    "31" -> Type.FOUR_OF_A_KIND
+                    "22" -> Type.FULL_HOUSE
+                    "211" -> Type.THREE_OF_A_KIND
+                    else -> Type.ONE_PAIR
+                }
+
+                else -> when (grouped) {
+                    "5" -> Type.FIVE_OF_A_KIND
+                    "41" -> Type.FOUR_OF_A_KIND
+                    "32" -> Type.FULL_HOUSE
+                    "311" -> Type.THREE_OF_A_KIND
+                    "221" -> Type.TWO_PAIRS
+                    "2111" -> Type.ONE_PAIR
+                    else -> Type.HIGH_CARD
+                }
             }
         }
 
-        override fun compareTo(other: Hand): Int {
-            val c = type compareTo other.type
-            if (c != 0) return c
-            val order = if (joker) "AKQT98765432J" else "AKQJT98765432"
-            return hand.withIndex().firstNotNullOfOrNull { (i, h) ->
-                // comparing in reversed order because order constant is descending
-                (order.indexOf(other.hand[i]) compareTo order.indexOf(h)).takeIf { it != 0 }
-            } ?: 0
+        private val value = with((if (joker) "AKQT98765432J" else "AKQJT98765432").reversed()) {
+            hand.fold(0L) { acc, c -> acc * length + indexOf(c) }
         }
+
+        override fun compareTo(other: Hand) = compareValuesBy(this, other, { it.type}, { it.value })
     }
 
     private fun parse(input: List<String>, joker: Boolean): List<Hand> {
         return input.map { line -> line.split(" ").let { Hand(it[0], it[1].toInt(), joker) } }
     }
 
-    private fun one(input: List<String>): Int {
-        return parse(input, false).sorted().mapIndexed { index, hand -> (index + 1) * hand.bid }.sum()
-    }
+    private fun one(input: List<String>) = three(input, false)
 
-    private fun two(input: List<String>): Int {
-        return parse(input, true).sorted().mapIndexed { index, hand -> (index + 1) * hand.bid }.sum()
-    }
+    private fun two(input: List<String>) = three(input, true)
+
+    private fun three(input: List<String>, joker: Boolean): Int =
+        parse(input, joker).sorted().mapIndexed { index, hand -> (index + 1) * hand.bid }.sum()
 
     @Test
     fun testOne(input: List<String>) {
@@ -93,4 +91,7 @@ the rules for the types.  This initially ended up with the "joker == false" vers
 "when").  For the jokers, I started thinking how a number of jokers affect that rule, and given that there are only 5
 cases, I just open-coded them.  The only issue I had when then re-implementing part 1 using part 2 with "joker == false"
 was that I first forgot to adjust the order constant based on the joker flag.
+
+After concerting the code to Typescript, I found quite a few more cleanups and optimizations which I then also applied
+to this Kotlin code.  And I finally found a good reason to use `run`!
 */
