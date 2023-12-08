@@ -35,27 +35,32 @@ class Day08 {
         XXX = (XXX, XXX)
     """.trimIndent().lines()
 
-    class Network(val directions: String, val left: Map<String, String>, val right: Map<String, String>)
+    class LR(private val left: String, private val right: String) {
+        fun get(direction: Char) = if (direction == 'L') left else right
+    }
+
+    class Network(private val directions: String, private val steps: Map<String, LR>) {
+        fun nodes(condition: (String) -> Boolean) = steps.keys.filter(condition)
+        fun step(node: String, direction: Char) = steps[node]!!.get(direction)
+        fun directions() = generateSequence { directions.toList() }.flatten()
+    }
 
     private fun parse(input: List<String>): Network {
         val regex = Regex("""(\w+) = \((\w+), (\w+)\)""")
-        val left = mutableMapOf<String, String>()
-        val right = mutableMapOf<String, String>()
-        input.drop(2).forEach { line ->
-            val (n, l, r) = regex.matchEntire(line)!!.destructured
-            left[n] = l
-            right[n] = r
-        }
-        return Network(input[0], left, right)
+        return Network(input[0], buildMap {
+            input.drop(2).forEach { line ->
+                val (n, l, r) = regex.matchEntire(line)!!.destructured
+                put(n, LR(l, r))
+            }
+        })
     }
 
     private fun one(input: List<String>): Int {
         val network = parse(input)
         var node = "AAA"
         var count = 0
-        val directions = sequence { while (true) yieldAll(network.directions.toList()) }
-        directions.forEach { d ->
-            node = if (d == 'L') network.left[node]!! else network.right[node]!!
+        network.directions().forEach { d ->
+            node = network.step(node, d)
             count++
             if (node == "ZZZ") return count
         }
@@ -64,14 +69,13 @@ class Day08 {
 
     private fun two(input: List<String>): Long {
         val network = parse(input)
-        val startNodes = network.left.keys.filter { it.endsWith("A") }
+        val startNodes = network.nodes { it.endsWith("A") }
 
         fun steps(start: String): Long {
             var count = 0L
-            val directions = sequence { while (true) yieldAll(network.directions.toList()) }
             var node = start
-            directions.forEach { d ->
-                node = if (d == 'L') network.left[node]!! else network.right[node]!!
+            network.directions().forEach { d ->
+                node = network.step(node, d)
                 count++
                 if (node.endsWith("Z")) return count
             }
@@ -83,17 +87,15 @@ class Day08 {
 
     private fun three(input: List<String>, startCondition: (String) -> Boolean, endCondition: (String) -> Boolean): Long {
         val network = parse(input)
-        val startNodes = network.left.keys.filter(startCondition)
 
         fun steps(start: String): Long {
             var count = 0L
-            val directions = sequence { while (true) yieldAll(network.directions.toList()) }
             var node = start
             var firstEnd: String? = null
             var firstCount = 0L
-            directions.forEach { d ->
+            network.directions().forEach { d ->
                 count++
-                node = if (d == 'L') network.left[node]!! else network.right[node]!!
+                node = network.step(node, d)
                 if (endCondition(node)) {
                     if (firstEnd == null) {
                         firstEnd = node
@@ -108,7 +110,7 @@ class Day08 {
             error("no end")
         }
 
-        return startNodes.map { steps(it) }.reduce { acc, c -> lcm(acc, c) }
+        return network.nodes(startCondition).map { steps(it) }.reduce { acc, c -> lcm(acc, c) }
     }
 
     @Test
