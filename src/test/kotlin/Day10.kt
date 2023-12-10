@@ -148,7 +148,7 @@ class Day10 {
 
         area.tiles().filter { area.get(it) != '#' }.forEach { area.set(it, '.') }
 
-        area.edges()
+        area.corners()
             .filter { area.get(it) == '.' }
             .forEach { e ->
                 area.set(e, 'O')
@@ -182,4 +182,8 @@ tiles with 'O', and (4) count the remaining '.' that were part of the initial ar
 
 This was first pretty open-coded using a 2-dimensional char array, but then I extracted all that area processing into
 a `CharArea` helper class, which then simplified the Day 10 solution.
+
+Update: after looking at the Slack channel, I realized that there are (again!) much faster solutions (using stuff I
+never heard of like "shoelace formula", "Pick's theorem", "Stokes' theorem"). The only hint I took was to only look at
+the 4 corner tiles instead of all the edge tiles when "flooding" the area.
 */

@@ -2,6 +2,8 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 
+typealias IntPair = Pair<Int, Int>
+
 /**
  * Creates a sequence of permutations. number of permutations of a list of length n is n!. This is an implementation
  * of the approach described by Dijkstra in 1976. It creates an array of indices, and then in every iteration returns
@@ -22,7 +24,7 @@ fun <T> List<T>.permutations(): Sequence<List<T>> = sequence {
 /**
  * This generates a list of the coordinates of the 4 neighbors of a cell in a 2-dimensional generic array
  */
-fun <T> Array<Array<T>>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
+fun <T> Array<Array<T>>.neighbors4(x: Int, y: Int): List<IntPair> =
     listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         .map { (dx, dy) -> x + dx to y + dy }
         .filter { (cx, cy) -> cx in this[0].indices && cy in this.indices }
@@ -30,7 +32,7 @@ fun <T> Array<Array<T>>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
 /**
  * This generates a list of the coordinates of the 4 neighbors of a cell in a 2-dimensional Int array
  */
-fun Array<IntArray>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
+fun Array<IntArray>.neighbors4(x: Int, y: Int): List<IntPair> =
     listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         .map { (dx, dy) -> x + dx to y + dy }
         .filter { (cx, cy) -> cx in this[0].indices && cy in this.indices }
@@ -38,9 +40,9 @@ fun Array<IntArray>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
 /**
  * This generates a list of the coordinates of the 4 neighbors of a cell in a 2-dimensional Char array
  */
-fun Array<CharArray>.neighbors4(xy: Pair<Int, Int>) = neighbors4(xy.first, xy.second)
+fun Array<CharArray>.neighbors4(xy: IntPair) = neighbors4(xy.first, xy.second)
 
-fun Array<CharArray>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
+fun Array<CharArray>.neighbors4(x: Int, y: Int): List<IntPair> =
     listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
         .map { (dx, dy) -> x + dx to y + dy }
         .filter { (cx, cy) -> cx in this[0].indices && cy in this.indices }
@@ -48,7 +50,7 @@ fun Array<CharArray>.neighbors4(x: Int, y: Int): List<Pair<Int, Int>> =
 /**
  * This generates a list of the coordinates of the 8 neighbors of a cell in a 2-dimensional generic array
  */
-fun <T> Array<Array<T>>.neighbors8(x: Int, y: Int): List<Pair<Int, Int>> =
+fun <T> Array<Array<T>>.neighbors8(x: Int, y: Int): List<IntPair> =
     listOf(-1 to -1, -1 to 0, -1 to 1, 0 to -1, 0 to 1, 1 to -1, 1 to 0, 1 to 1)
         .map { (dx, dy) -> x + dx to y + dy }
         .filter { (cx, cy) -> cx in this[0].indices && cy in this.indices }
@@ -56,7 +58,7 @@ fun <T> Array<Array<T>>.neighbors8(x: Int, y: Int): List<Pair<Int, Int>> =
 /**
  * This generates a list of the coordinates of the 8 neighbors of a cell in a 2-dimensional Int array
  */
-fun Array<IntArray>.neighbors8(x: Int, y: Int): List<Pair<Int, Int>> =
+fun Array<IntArray>.neighbors8(x: Int, y: Int): List<IntPair> =
     listOf(-1 to -1, -1 to 0, -1 to 1, 0 to -1, 0 to 1, 1 to -1, 1 to 0, 1 to 1)
         .map { (dx, dy) -> x + dx to y + dy }
         .filter { (cx, cy) -> cx in this[0].indices && cy in this.indices }
