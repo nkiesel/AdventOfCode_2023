@@ -1,6 +1,5 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import kotlin.math.min
 
 class Day05 {
     private val sample = """
@@ -40,19 +39,29 @@ class Day05 {
     """.trimIndent().lines()
 
     class Transformation(private val sourceRange: LongRange, private val offset: Long) {
+        private val destRange = sourceRange.first - offset..sourceRange.last - offset
+
         constructor(destination: Long, source: Long, length: Long) : this(
-            source..< source + length,
+            source..<source + length,
             source - destination
         )
 
         fun transform(value: Long): Long? {
             return if (value in sourceRange) value - offset else null
         }
+
+        fun reverse(value: Long): Long? {
+            return if (value in destRange) value + offset else null
+        }
     }
 
     class Mapping(private val transformations: List<Transformation>) {
         fun transform(value: Long): Long {
             return transformations.firstNotNullOfOrNull { it.transform(value) } ?: value
+        }
+
+        fun reverse(value: Long): Long {
+            return transformations.firstNotNullOfOrNull { it.reverse(value) } ?: value
         }
     }
 
@@ -70,7 +79,7 @@ class Day05 {
 
     @Test
     fun testTwo(input: List<String>) {
-        two(sample) shouldBe 46
+        two(sample) shouldBe 46L
         two(input) shouldBe 20191102L
     }
 
@@ -82,21 +91,21 @@ class Day05 {
 
     private fun two(input: List<String>): Long {
         val seeds = input[0].longs().chunked(2).map { it[0]..<it[0] + it[1] }
-        println("${seeds.size} seed ranges with ${seeds.sumOf { it.last - it.first + 1 }} values")
-        val mappings = parse(input)
-        var minValue = Long.MAX_VALUE
-        seeds.forEachIndexed { index, seedRange ->
-            for (v in seedRange) {
-                if (index == 0 || seeds.take(index - 1).none { v in it }) {
-                    minValue = min(minValue, mappings.fold(v) { acc, mapping -> mapping.transform(acc) })
-                }
+        val mappings = parse(input).reversed()
+        for (v in 0L..Long.MAX_VALUE) {
+            val s = mappings.fold(v) { acc, mapping -> mapping.reverse(acc) }
+            if (seeds.any { s in it }) {
+                return v
             }
         }
-        return minValue
+        error("no solution")
     }
 }
 
 /*
 We are now getting into typical AoC territory: Int overflows, and brute force no longer works.  My solution for part 2
 works, but runs for a looong time.  I'm sure there are optimizations I'm missing, but cannot think of anything right now.
- */
+
+Update: reversed the transformations for part 2, and it now finishes in a few seconds.  Pretty sure there must still be
+a much better approach than brute-forcing, but will let it rest for now.
+*/
