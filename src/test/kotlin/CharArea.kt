@@ -2,8 +2,8 @@ class CharArea(private val area: Array<CharArray>) {
     constructor(mx: Int, my: Int, def: Char) : this(Array(my) { CharArray(mx) { def } })
     constructor(lines: List<String>) : this(lines.map { it.toCharArray() }.toTypedArray())
 
-    private val xRange = area[0].indices
-    private val yRange = area.indices
+    val xRange = area[0].indices
+    val yRange = area.indices
 
     fun get(x: Int, y: Int) = area[y][x]
 
@@ -71,4 +71,12 @@ class CharArea(private val area: Array<CharArray>) {
     fun show() {
         area.forEach { println(it) }
     }
+
+    fun rows() = sequence { yRange.forEach { y -> yield(area[y]) } }
+
+    fun columns() = sequence { xRange.forEach { x -> yield(yRange.map { y -> get(x, y) }) } }
+
+    fun row(i: Int) = area[i]
+
+    fun column(i: Int) = yRange.map { get(i, it) }
 }
