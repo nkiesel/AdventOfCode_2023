@@ -82,7 +82,7 @@ class CharArea(private val area: Array<CharArray>) {
 
     fun substring(y: Int, startIndex: Int, endIndex: Int) = area[y].concatToString(startIndex, endIndex)
 
-    fun inverted(): CharArea {
+    fun rotated(): CharArea {
         val inverted = CharArea(yRange.last + 1, xRange.last + 1, ' ')
         tiles().forEach { (x, y) -> inverted.set(y, x, get(x, y)) }
         return inverted

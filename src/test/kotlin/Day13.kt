@@ -42,11 +42,11 @@ class Day13 {
     }
 
     private fun one(input: List<String>): Int {
-        return parse(input).sumOf { area -> vertical(area) + vertical(area.inverted()) * 100 }
+        return parse(input).sumOf { area -> vertical(area) + vertical(area.rotated()) * 100 }
     }
 
     private fun smudge(area: CharArea): Int {
-        val inverted = area.inverted()
+        val inverted = area.rotated()
         val v = vertical(area)
         val h = vertical(inverted)
         for (x in area.xRange) {
