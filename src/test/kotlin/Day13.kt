@@ -30,11 +30,7 @@ class Day13 {
         for (x in 1..<mx) {
             if (x == exclude) continue
             val w = min(x, mx - x)
-            if (area.yRange.all { y ->
-                    val s1 = area.substring(y, x - w, x).reversed()
-                    val s2 = area.substring(y, x, x + w)
-                    s1 == s2
-                }) {
+            if (area.yRange.all { y -> area.substring(y, x - w, x).reversed() == area.substring(y, x, x + w) }) {
                 return x
             }
         }
@@ -45,31 +41,28 @@ class Day13 {
         return parse(input).sumOf { area -> vertical(area) + vertical(area.rotated()) * 100 }
     }
 
-    private fun smudge(area: CharArea): Int {
-        val inverted = area.rotated()
+    private fun smudged(area: CharArea): Int {
+        val rotated = area.rotated()
         val v = vertical(area)
-        val h = vertical(inverted)
-        for (x in area.xRange) {
-            for (y in area.yRange) {
-                val c = area.get(x, y)
-                val o = if (c == '.') '#' else '.'
-                area.set(x, y, o)
-                inverted.set(y, x, o)
-                val v1 = vertical(area, v)
-                val h1 = vertical(inverted, h)
-                if (v1 != 0 || h1 != 0) {
-                    return v1 + h1 * 100
-                }
-                area.set(x, y, c)
-                inverted.set(y, x, c)
+        val h = vertical(rotated)
+        area.tiles().forEach { (x, y) ->
+            val c = area.get(x, y)
+            val o = if (c == '.') '#' else '.'
+            area.set(x, y, o)
+            rotated.set(y, x, o)
+            val v1 = vertical(area, v)
+            val h1 = vertical(rotated, h)
+            if (v1 != 0 || h1 != 0) {
+                return v1 + h1 * 100
             }
+            area.set(x, y, c)
+            rotated.set(y, x, c)
         }
         error("no smudge")
     }
 
-
     private fun two(input: List<String>): Int {
-        return parse(input).sumOf { smudge(it) }
+        return parse(input).sumOf { smudged(it) }
     }
 
     @Test
