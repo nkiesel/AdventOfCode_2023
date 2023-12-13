@@ -79,4 +79,12 @@ class CharArea(private val area: Array<CharArray>) {
     fun row(i: Int) = area[i]
 
     fun column(i: Int) = yRange.map { get(i, it) }
+
+    fun substring(y: Int, startIndex: Int, endIndex: Int) = area[y].concatToString(startIndex, endIndex)
+
+    fun inverted(): CharArea {
+        val inverted = CharArea(yRange.last + 1, xRange.last + 1, ' ')
+        tiles().forEach { (x, y) -> inverted.set(y, x, get(x, y)) }
+        return inverted
+    }
 }
