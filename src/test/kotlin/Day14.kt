@@ -54,8 +54,8 @@ class Day14 {
     private fun one(input: List<String>): Int {
         val area = CharArea(input)
         northSouth(area, true)
-        val my = area.yRange.last + 1
-        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') my - y else 0 }
+        val maxY = area.yRange.last + 1
+        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') maxY - y else 0 }
     }
 
     private fun two(input: List<String>): Int {
@@ -63,7 +63,7 @@ class Day14 {
         var cycles = 1000000000
         var cycle = 0
         var detect = true
-        val cache = mutableMapOf<String, Int>()
+        val cache = mutableMapOf<Int, Int>()
         while (cycles > 0) {
             northSouth(area, true)
             westEast(area, true)
@@ -72,7 +72,7 @@ class Day14 {
             cycles--
             cycle++
             if (detect) {
-                val fingerprint = area.toString()
+                val fingerprint = area.hashCode()
                 val prev = cache[fingerprint]
                 if (prev == null) {
                     cache[fingerprint] = cycle
@@ -82,8 +82,8 @@ class Day14 {
                 }
             }
         }
-        val my = area.yRange.last + 1
-        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') my - y else 0 }
+        val maxY = area.yRange.last + 1
+        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') maxY - y else 0 }
     }
 
     @Test
@@ -106,4 +106,7 @@ thought about what must be changed to tilt to south. Turned out to just be rever
 very simple. Given the amount of cycles, it was obvious that we must memorize.  I first thought of optimizing this by
 converting the positions of the 'O' into a fingerprint, but as a start I simply used the whole area converted to a string.
 The code is running fast enough, so I will not optimize further to keep it simple.
+
+Update: changed the cache to use the hashCode of the CharArea as key. No big performance difference, but should save
+some memory.
 */

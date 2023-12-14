@@ -91,4 +91,12 @@ class CharArea(private val area: Array<CharArray>) {
     override fun toString(): String {
         return area.joinToString("\n") { it.joinToString("") }
     }
+
+    override fun hashCode(): Int {
+        return toString().hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is CharArea && toString() == other.toString()
+    }
 }
