@@ -87,4 +87,8 @@ class CharArea(private val area: Array<CharArray>) {
         tiles().forEach { (x, y) -> inverted.set(y, x, get(x, y)) }
         return inverted
     }
+
+    override fun toString(): String {
+        return area.joinToString("\n") { it.joinToString("") }
+    }
 }
