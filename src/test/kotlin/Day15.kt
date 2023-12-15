@@ -18,8 +18,7 @@ class Day15 {
         companion object {
             private val re = Regex("""(.+)([-=])(\d+)?""")
 
-            fun of(s: String) =
-                re.matchEntire(s)!!.groupValues.let { Lens(it[1], it[2][0], it[3].toIntOrNull() ?: 0) }
+            fun of(s: String) = re.matchEntire(s)!!.groupValues.let { Lens(it[1], it[2][0], it[3].toIntOrNull() ?: 0) }
         }
     }
 
@@ -36,7 +35,7 @@ class Day15 {
             }
         }
         return boxes.withIndex()
-            .sumOf { b -> b.value.withIndex().sumOf { i -> (b.index + 1) * (i.index + 1) * i.value.focal } }
+            .sumOf { b -> (b.index + 1) * b.value.withIndex().sumOf { (it.index + 1) * it.value.focal } }
     }
 
     @Test
