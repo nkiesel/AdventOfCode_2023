@@ -18,10 +18,8 @@ class Day15 {
         companion object {
             private val re = Regex("""(.+)([-=])(\d+)?""")
 
-            fun of(s: String): Lens {
-                val l = re.matchEntire(s)!!.groupValues
-                return Lens(l[1], l[2][0], l[3].toIntOrNull() ?: 0)
-            }
+            fun of(s: String) =
+                re.matchEntire(s)!!.groupValues.let { Lens(it[1], it[2][0], it[3].toIntOrNull() ?: 0) }
         }
     }
 
