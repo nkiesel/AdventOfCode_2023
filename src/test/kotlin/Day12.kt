@@ -17,35 +17,27 @@ class Day12 {
 
     private val cache: MutableMap<Pair<String, List<Int>>, Long> = mutableMapOf()
 
-    private fun count(springs: String, damage: List<Int>): Long = cache.getOrPut(springs to damage) {
-        if (springs.isEmpty()) return@getOrPut if (damage.isEmpty()) 1L else 0L
-
-        val thisSpring = springs.first()
-        val remainingSprings = springs.drop(1)
-
-        return@getOrPut when (thisSpring) {
-            '.' -> count(remainingSprings.dropWhile { it == '.' }, damage)
-
-            '?' -> {
-                count(remainingSprings, damage) + count("#$remainingSprings", damage)
-            }
-
-            '#' -> when {
-                damage.isEmpty() -> 0L
+    private fun count(springs: String, damages: List<Int>): Long = cache.getOrPut(springs to damages) {
+        val spring = springs.firstOrNull()
+        val damage = damages.firstOrNull()
+        if (spring == null) {
+            if (damage == null) 1L else 0L
+        } else {
+            val remainingSprings = springs.drop(1)
+            when {
+                spring == '.' -> count(remainingSprings.dropWhile { it == '.' }, damages)
+                spring == '?' -> count(remainingSprings, damages) + count("#$remainingSprings", damages)
+                damage == null -> 0L
                 else -> {
-                    val thisDamage = damage.first()
-                    val remainingDamage = damage.drop(1)
-                    if (thisDamage <= springs.length && springs.take(thisDamage).none { it == '.' }) {
-                        when {
-                            thisDamage == springs.length -> if (remainingDamage.isEmpty()) 1L else 0L
-                            springs[thisDamage] == '#' -> 0
-                            else -> count(remainingSprings.drop(thisDamage), remainingDamage)
-                        }
-                    } else 0L
+                    val remainingDamage = damages.drop(1)
+                    when {
+                        damage > springs.length || springs.take(damage).any { it == '.' } -> 0L
+                        damage == springs.length -> if (remainingDamage.isEmpty()) 1L else 0L
+                        springs[damage] == '#' -> 0L
+                        else -> count(remainingSprings.drop(damage), remainingDamage)
+                    }
                 }
             }
-
-            else -> error("Invalid springs: $springs")
         }
     }
 
@@ -80,4 +72,6 @@ correctly because I used "return" instead of "return@getOrPut", which rus side-s
 I then abandoned my original part 1 solution which constructed a regex and mapped all possible combinations of '.' or
 '#' for '?'.  This required "2^{ count of '?' }" tests, which worked ok for part 1 with at most 19 '?', but 2^99 is
 way too large.
+
+Update: avoided all "return" in the "orPut" part, which simplified the code a bit further.
 */
