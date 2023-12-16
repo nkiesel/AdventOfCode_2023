@@ -15,7 +15,7 @@ class Day16 {
         ..//.|....
     """.trimIndent().lines()
 
-    data class Beam(var x: Int, var y: Int, var dx: Int, var dy: Int)
+    data class Beam(val x: Int, val y: Int, val dx: Int, val dy: Int)
 
     private fun one(area: CharArea, start: Beam): Int {
         var beams = listOf(start)
