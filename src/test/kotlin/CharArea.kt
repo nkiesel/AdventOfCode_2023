@@ -1,3 +1,21 @@
+enum class Direction { N, S, E, W }
+
+data class Point(val x: Int, val y: Int) {
+    fun move(d: Direction) = Point(
+        x + when (d) {
+            Direction.E -> 1
+            Direction.W -> -1
+            else -> 0
+        },
+        y + when (d) {
+            Direction.N -> -1
+            Direction.S -> 1
+            else -> 0
+        }
+    )
+    fun move(dx: Int, dy: Int) = Point(x + dx, y + dy)
+}
+
 class CharArea(private val area: Array<CharArray>) {
     constructor(mx: Int, my: Int, def: Char) : this(Array(my) { CharArray(mx) { def } })
     constructor(lines: List<String>) : this(lines.map { it.toCharArray() }.toTypedArray())
@@ -7,13 +25,15 @@ class CharArea(private val area: Array<CharArray>) {
 
     fun get(x: Int, y: Int) = area[y][x]
 
-    fun getOrNull(x: Int, y: Int) = if (valid(x, y)) area[y][x] else null
+    fun getOrNull(x: Int, y: Int) = if (valid(x, y)) get(x, y) else null
 
-    fun get(p: IntPair) = get(p.first, p.second)
+    fun getOrNull(p: Point) = if (valid(p)) get(p) else null
+
+    fun get(p: Point) = get(p.x, p.y)
 
     fun valid(x: Int, y: Int) = x in xRange && y in yRange
 
-    fun valid(p: IntPair) = valid(p.first, p.second)
+    fun valid(p: Point) = valid(p.x, p.y)
 
     fun set(x: Int, y: Int, c: Char) {
         if (valid(x, y)) area[y][x] = c
@@ -23,50 +43,50 @@ class CharArea(private val area: Array<CharArray>) {
         if (valid(x, y)) area[y][x] = c(area[y][x])
     }
 
-    fun set(p: IntPair, c: Char) {
-        set(p.first, p.second, c)
+    fun set(p: Point, c: Char) {
+        set(p.x, p.y, c)
     }
 
-    fun tiles(): Sequence<IntPair> = sequence {
+    fun tiles(): Sequence<Point> = sequence {
         for (x in xRange) {
             for (y in yRange) {
-                yield(Pair(x, y))
+                yield(Point(x, y))
             }
         }
     }
 
-    fun edges(): Sequence<IntPair> = tiles()
+    fun edges(): Sequence<Point> = tiles()
         .filter { (x, y) -> x == xRange.first || x == xRange.last || y == yRange.first || y == yRange.last }
 
     fun corners() = listOf(
-        Pair(xRange.first, yRange.first),
-        Pair(xRange.first, yRange.last),
-        Pair(xRange.last, yRange.first),
-        Pair(xRange.last, yRange.last),
+        Point(xRange.first, yRange.first),
+        Point(xRange.first, yRange.last),
+        Point(xRange.last, yRange.first),
+        Point(xRange.last, yRange.last),
     )
 
-    fun first(c: Char): IntPair {
+    fun first(c: Char): Point {
         val y = area.indexOfFirst { c in it }
         val x = area[y].indexOfFirst { it == c }
-        return Pair(x, y)
+        return Point(x, y)
     }
 
-    fun filter(condition: (IntPair) -> Boolean) = sequence {
+    fun filter(condition: (Point) -> Boolean) = sequence {
         for (x in xRange) {
             for (y in yRange) {
-                val p = Pair(x, y)
+                val p = Point(x, y)
                 if (condition(p))
                     yield(p)
             }
         }
     }
 
-    fun neighbors4(x: Int, y: Int): List<IntPair> =
+    fun neighbors4(x: Int, y: Int): List<Point> =
         listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
-            .map { (dx, dy) -> x + dx to y + dy }
+            .map { (dx, dy) -> Point(x + dx, y + dy) }
             .filter { valid(it) }
 
-    fun neighbors4(p: IntPair): List<IntPair> = neighbors4(p.first, p.second)
+    fun neighbors4(p: Point): List<Point> = neighbors4(p.x, p.y)
 
     fun show() {
         area.forEach { println(it) }
@@ -100,5 +120,5 @@ class CharArea(private val area: Array<CharArray>) {
         return other is CharArea && toString() == other.toString()
     }
 
-    operator fun contains(p: IntPair) = p.first in xRange && p.second in yRange
+    operator fun contains(p: Point) = p.x in xRange && p.y in yRange
 }

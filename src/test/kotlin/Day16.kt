@@ -1,4 +1,4 @@
-import Day16.Direction.*
+import Direction.*
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
@@ -16,30 +16,17 @@ class Day16 {
         ..//.|....
     """.trimIndent().lines()
 
-    enum class Direction { N, S, E, W }
-
-    data class Beam(val p: IntPair, val d: Direction)
+    data class Beam(val p: Point, val d: Direction)
 
     private fun energized(area: CharArea, start: Beam): Int {
         var beams = setOf(start)
-        val energized = mutableSetOf<IntPair>()
+        val energized = mutableSetOf<Point>()
         val seen = mutableSetOf<Beam>()
         do {
             beams = buildSet {
                 beams.filter { seen.add(it) }.forEach { beam ->
                     val d = beam.d
-                    val p = Pair(
-                        beam.p.first + when (d) {
-                            E -> 1
-                            W -> -1
-                            else -> 0
-                        },
-                        beam.p.second + when (d) {
-                            N -> -1
-                            S -> 1
-                            else -> 0
-                        }
-                    )
+                    val p = beam.p.move(d)
                     if (p in area) {
                         energized += p
                         when (area.get(p)) {
@@ -69,7 +56,7 @@ class Day16 {
     }
 
     private fun one(input: List<String>): Int {
-        return energized(CharArea(input), Beam(Pair(-1, 0), E))
+        return energized(CharArea(input), Beam(Point(-1, 0), E))
     }
 
     private fun two(input: List<String>): Int {
@@ -77,10 +64,10 @@ class Day16 {
         val mx = area.xRange.last + 1
         val my = area.yRange.last + 1
         return listOf(
-            area.yRange.map { y -> Beam(Pair(-1, y), E) },
-            area.yRange.map { y -> Beam(Pair(mx, y), W) },
-            area.xRange.map { x -> Beam(Pair(x, -1), S) },
-            area.xRange.map { x -> Beam(Pair(x, my), N) },
+            area.yRange.map { y -> Beam(Point(-1, y), E) },
+            area.yRange.map { y -> Beam(Point(mx, y), W) },
+            area.xRange.map { x -> Beam(Point(x, -1), S) },
+            area.xRange.map { x -> Beam(Point(x, my), N) },
         ).flatten().maxOf { energized(area, it) }
     }
 

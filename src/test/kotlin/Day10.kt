@@ -111,21 +111,21 @@ class Day10 {
         do {
             steps++
             buildList {
-                add(Pair(x, y))
+                add(Point(x, y))
                 when (area.get(x, y)) {
                     'S' -> when (d) {
-                        N -> add(Pair(x, y - 1))
-                        S -> add(Pair(x, y + 1))
-                        E -> add(Pair(x + 1, y))
-                        W -> add(Pair(x - 1, y))
+                        N -> add(Point(x, y - 1))
+                        S -> add(Point(x, y + 1))
+                        E -> add(Point(x + 1, y))
+                        W -> add(Point(x - 1, y))
                     }
 
-                    '-' -> addAll(listOf(Pair(x - 1, y), Pair(x + 1, y)))
-                    '|' -> addAll(listOf(Pair(x, y - 1), Pair(x, y + 1)))
-                    'J' -> addAll(listOf(Pair(x - 1, y), Pair(x, y - 1)))
-                    '7' -> addAll(listOf(Pair(x - 1, y), Pair(x, y + 1)))
-                    'F' -> addAll(listOf(Pair(x + 1, y), Pair(x, y + 1)))
-                    'L' -> addAll(listOf(Pair(x + 1, y), Pair(x, y - 1)))
+                    '-' -> addAll(listOf(Point(x - 1, y), Point(x + 1, y)))
+                    '|' -> addAll(listOf(Point(x, y - 1), Point(x, y + 1)))
+                    'J' -> addAll(listOf(Point(x - 1, y), Point(x, y - 1)))
+                    '7' -> addAll(listOf(Point(x - 1, y), Point(x, y + 1)))
+                    'F' -> addAll(listOf(Point(x + 1, y), Point(x, y + 1)))
+                    'L' -> addAll(listOf(Point(x + 1, y), Point(x, y - 1)))
                 }
             }.forEach { area.set(it, '#') }
             x += d.x * 3

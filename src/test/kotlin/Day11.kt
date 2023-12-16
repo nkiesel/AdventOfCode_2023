@@ -29,7 +29,7 @@ class Day11 {
         var sum = 0
         galaxies.forEachIndexed { index, g1 ->
             galaxies.drop(index + 1).forEach { g2 ->
-                val d = manhattanDistance(g1.first, g1.second, g2.first, g2.second)
+                val d = manhattanDistance(g1.x, g1.y, g2.x, g2.y)
                 sum += d
             }
         }
@@ -45,8 +45,8 @@ class Day11 {
         return galaxies
             .flatMapIndexed { index, g -> galaxies.drop(index).map { g to it } }
             .sumOf { (g1, g2) ->
-                val rx = min(g1.first, g2.first)..max(g1.first, g2.first)
-                val ry = min(g1.second, g2.second)..max(g1.second, g2.second)
+                val rx = min(g1.x, g2.y)..max(g1.x, g2.y)
+                val ry = min(g1.y, g2.y)..max(g1.y, g2.y)
                 val dx = (factor - 1L) * emptyCols.count { it in rx } + rx.last - rx.first
                 val dy = (factor - 1L) * emptyRows.count { it in ry } + ry.last - ry.first
                 dx + dy
