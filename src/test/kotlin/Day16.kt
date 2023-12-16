@@ -44,17 +44,17 @@ class Day16 {
                         energized += p
                         when (area.get(p)) {
                             '\\' -> when (d) {
+                                N -> listOf(W)
+                                S -> listOf(E)
                                 E -> listOf(S)
                                 W -> listOf(N)
-                                S -> listOf(E)
-                                N -> listOf(W)
                             }
 
                             '/' -> when (d) {
+                                N -> listOf(E)
+                                S -> listOf(W)
                                 E -> listOf(N)
                                 W -> listOf(S)
-                                S -> listOf(W)
-                                N -> listOf(E)
                             }
 
                             '-' -> if (d == N || d == S) listOf(E, W) else listOf(d)
@@ -77,11 +77,11 @@ class Day16 {
         val mx = area.xRange.last + 1
         val my = area.yRange.last + 1
         return listOf(
-            area.yRange.maxOf { y -> energized(area, Beam(Pair(-1, y), E)) },
-            area.yRange.maxOf { y -> energized(area, Beam(Pair(mx, y), W)) },
-            area.xRange.maxOf { x -> energized(area, Beam(Pair(x, -1), S)) },
-            area.xRange.maxOf { x -> energized(area, Beam(Pair(x, my), N)) },
-        ).max()
+            area.yRange.map { y -> Beam(Pair(-1, y), E) },
+            area.yRange.map { y -> Beam(Pair(mx, y), W) },
+            area.xRange.map { x -> Beam(Pair(x, -1), S) },
+            area.xRange.map { x -> Beam(Pair(x, my), N) },
+        ).flatten().maxOf { energized(area, it) }
     }
 
     @Test
@@ -98,7 +98,7 @@ class Day16 {
 }
 
 /*
-Again pretty simple from an algorithmic point of view.  One question I had was what happens to beams that hit a
-boundary of the area. Then - apart from one +/- error - the only other issue was that I initially did not add
+Again pretty simple from an algorithmic point of view.  One question I had was: what happens to beams that hit a
+boundary of the area? Then - apart from one +/- error - the only other issue was that I initially did not add
 the "seen" cache, which made the code run forever.
 */
