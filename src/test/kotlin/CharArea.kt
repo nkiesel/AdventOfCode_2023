@@ -99,4 +99,6 @@ class CharArea(private val area: Array<CharArray>) {
     override fun equals(other: Any?): Boolean {
         return other is CharArea && toString() == other.toString()
     }
+
+    operator fun contains(p: IntPair) = p.first in xRange && p.second in yRange
 }
