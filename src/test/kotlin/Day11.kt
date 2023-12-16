@@ -45,7 +45,7 @@ class Day11 {
         return galaxies
             .flatMapIndexed { index, g -> galaxies.drop(index).map { g to it } }
             .sumOf { (g1, g2) ->
-                val rx = min(g1.x, g2.y)..max(g1.x, g2.y)
+                val rx = min(g1.x, g2.x)..max(g1.x, g2.x)
                 val ry = min(g1.y, g2.y)..max(g1.y, g2.y)
                 val dx = (factor - 1L) * emptyCols.count { it in rx } + rx.last - rx.first
                 val dy = (factor - 1L) * emptyRows.count { it in ry } + ry.last - ry.first

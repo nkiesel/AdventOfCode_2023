@@ -1,23 +1,18 @@
 enum class Direction { N, S, E, W }
 
 data class Point(val x: Int, val y: Int) {
-    fun move(d: Direction) = Point(
-        x + when (d) {
-            Direction.E -> 1
-            Direction.W -> -1
-            else -> 0
-        },
-        y + when (d) {
-            Direction.N -> -1
-            Direction.S -> 1
-            else -> 0
-        }
-    )
+    fun move(d: Direction, n: Int = 1) = when (d) {
+        Direction.N -> Point(x, y - n)
+        Direction.S -> Point(x, y + n)
+        Direction.E -> Point(x + n, y)
+        Direction.W -> Point(x - n, y)
+    }
+
     fun move(dx: Int, dy: Int) = Point(x + dx, y + dy)
 }
 
 class CharArea(private val area: Array<CharArray>) {
-    constructor(mx: Int, my: Int, def: Char) : this(Array(my) { CharArray(mx) { def } })
+    constructor(columns: Int, rows: Int, def: Char) : this(Array(rows) { CharArray(columns) { def } })
     constructor(lines: List<String>) : this(lines.map { it.toCharArray() }.toTypedArray())
 
     val xRange = area[0].indices
