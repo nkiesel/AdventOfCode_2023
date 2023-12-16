@@ -1,5 +1,4 @@
 import io.kotest.matchers.shouldBe
-import jdk.internal.org.jline.utils.Colors.s
 import org.junit.jupiter.api.Test
 
 class Day16 {
@@ -16,19 +15,10 @@ class Day16 {
         ..//.|....
     """.trimIndent().lines()
 
-    data class Beam(var x: Int, var y: Int, var dx: Int, var dy: Int) {
-        fun isAlive(area: CharArea) = x in area.xRange && y in area.yRange
+    data class Beam(var x: Int, var y: Int, var dx: Int, var dy: Int)
 
-        fun move() {
-            x += dx
-            y += dy
-        }
-
-    }
-
-    private fun one(input: List<String>): Int {
-        val area = CharArea(input)
-        var beams = listOf(Beam(-1, 0, 1, 0))
+    private fun one(area: CharArea, start: Beam): Int {
+        var beams = listOf(start)
         val energized = mutableSetOf<Pair<Int, Int>>()
         val seen = mutableSetOf<Beam>()
         do {
@@ -74,27 +64,32 @@ class Day16 {
                     }
                 }
             }
-//            val s = CharArea(area.xRange.last + 1, area.yRange.last + 1, '.')
-//            energized.forEach { s.set(it, '#') }
-//            println("-----------------------")
-//            s.show()
-        } while (beams.any { it.isAlive(area) })
+        } while (beams.isNotEmpty())
         return energized.size
     }
 
     private fun two(input: List<String>): Int {
-        return 0
+        val area = CharArea(input)
+        val mx = area.xRange.last + 1
+        val my = area.yRange.last + 1
+        return listOf(
+            area.yRange.maxOf { y -> one(area, Beam(-1, y, 1, 0)) },
+            area.yRange.maxOf { y -> one(area, Beam(mx, y, -1, 0)) },
+            area.xRange.maxOf { x -> one(area, Beam(x, -1, 0, 1)) },
+            area.xRange.maxOf { x -> one(area, Beam(x, my, 0, -1)) },
+        ).max()
     }
 
     @Test
     fun testOne(input: List<String>) {
-        one(sample) shouldBe 46
-        one(input) shouldBe 8249
+        val start = Beam(-1, 0, 1, 0)
+        one(CharArea(sample), start) shouldBe 46
+        one(CharArea(input), start) shouldBe 8249
     }
 
     @Test
     fun testTwo(input: List<String>) {
-//        two(sample) shouldBe 51
-//        two(input) shouldBe 0
+        two(sample) shouldBe 51
+        two(input) shouldBe 8444
     }
 }
