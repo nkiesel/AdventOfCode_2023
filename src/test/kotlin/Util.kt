@@ -129,6 +129,8 @@ fun lcm(a: Long, b: Long): Long = a / gcd(a, b) * b
  */
 fun manhattanDistance(x1: Int, y1: Int, x2: Int, y2: Int) = (x1 - x2).absoluteValue + (y1 - y2).absoluteValue
 
+fun manhattanDistance(p1: Point, p2: Point) = (p1.x - p2.x).absoluteValue + (p1.y - p2.y).absoluteValue
+
 fun manhattanDistance(x1: Int, y1: Int, z1: Int, x2: Int, y2: Int, z2: Int) = (x1 - x2).absoluteValue + (y1 - y2).absoluteValue + (z1 - z2).absoluteValue
 
 fun manhattanDistance(p1: IntArray, p2: IntArray) = p1.zip(p2).sumOf { (it.first - it.second).absoluteValue }
