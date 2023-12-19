@@ -1,5 +1,7 @@
 import io.kotest.matchers.shouldBe
+import jdk.internal.org.jline.utils.Colors.s
 import org.junit.jupiter.api.Test
+import kotlin.math.max
 
 class Day19 {
     private val sample = """
@@ -27,6 +29,7 @@ class Day19 {
         val op: Char
         val t: Int
         val next: String
+        val map: Pair<Char, Int>
 
         init {
             val re = Regex("""(.)([<>])(\d+):(.+)""")
@@ -42,6 +45,7 @@ class Day19 {
                 t = 0
                 next = condition
             }
+            map = v to t
         }
 
         fun apply(part: Part): String? {
@@ -63,7 +67,16 @@ class Day19 {
         }
     }
 
-    class Part(val x: Int, val m: Int, val a: Int, val s: Int) {
+    data class Part(val x: Int, val m: Int, val a: Int, val s: Int) {
+        fun calc(xi: Int, mi: Int, ai: Int, si: Int, limits: Map<Char, List<Limit>>): Long {
+            return listOf(
+                if (xi == 0) x else x - limits['x']!![xi - 1].t,
+                if (mi == 0) m else m - limits['m']!![mi - 1].t,
+                if (ai == 0) a else a - limits['a']!![ai - 1].t,
+                if (si == 0) s else s - limits['s']!![si - 1].t,
+            ).fold(1L) { acc, i -> acc * i }
+        }
+
         val rating = x + m + a + s
         val map = mapOf('x' to x, 'm' to m, 'a' to a, 's' to s)
 
@@ -98,8 +111,108 @@ class Day19 {
         return parts.map { process("in", it) }.sumOf { it.rating }
     }
 
-    private fun two(input: List<String>): Int {
-        return 0
+    data class Limit(val op: Char, val t: Int) {
+        val l = if (op == '<') t - 1 else t
+        val u = if (op == '<') t else t + 1
+    }
+
+    private fun List<Limit>.expand(): List<Int> {
+        return buildList {
+            add(1)
+            add(4000)
+            this@expand.forEach {
+                add(it.t)
+                if (it.op == '<') add(it.t - 1) else add(it.t + 1)
+            }
+        }.sorted()
+    }
+
+    private fun two(input: List<String>): Long {
+        val (workflows, _) = parse(input)
+        val none = Part(0, 0, 0, 0)
+        val limits = workflows.asSequence().flatMap { it.value.rules }
+            .filterNot { it.v == 'v' }.map { it.v to Limit(it.op, it.t) }.groupBy({ it.first }, { it.second })
+            .mapValues { e -> e.value.expand() }
+        var count = 0L
+
+        fun process(name: String, part: Part): Part {
+            val workflow = workflows[name]!!
+            for (rule in workflow.rules) {
+                return when (val outcome = rule.apply(part)) {
+                    "A" -> part
+                    "R" -> none
+                    null -> continue
+                    else -> process(outcome, part)
+                }
+            }
+            error("did not terminate")
+        }
+
+        val part = Part(1, 1800, 4000, 1)
+        println(part)
+        println(process("in", part))
+
+        println(limits['x'])
+        println(limits['m'])
+        println(limits['a'])
+        println(limits['s'])
+
+        var ms = 0L
+        for (x in limits['x']!!) {
+            for (m in limits['m']!!) {
+                for (a in limits['a']!!) {
+                    val s = (1..4000).count { process("in", Part(x, m, a, it)) != none }.toLong()
+//                    val s = limits['s']!!.map { it to process("in", Part(x, m, a, it)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
+                    if (x == 1 && m == 1800 && a == 4000) {
+                        println("s is $s")
+                    }
+                    ms = max(s, ms)
+                }
+            }
+        }
+        println("s: $ms")
+        count = ms
+
+//        var mx =0L
+//        for (m in limits['m']!!) {
+//            for (a in limits['a']!!) {
+//                for (s in limits['s']!!) {
+//                    val x = (1..4000).count { process("in", Part(it, m, a, s)) != none }.toLong()
+////                    val x = limits['x']!!.map { it to process("in", Part(it, m, a, s)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
+//                    mx = max(x, mx)
+//                }
+//            }
+//        }
+//        println("x: $mx")
+//        count *= mx
+//
+//        var mm = 0L
+//        for (a in limits['a']!!) {
+//            for (s in limits['s']!!) {
+//                for (x in limits['x']!!) {
+//                    val m = (1..4000).count { process("in", Part(x, it, a, s)) != none }.toLong()
+////                    val m = limits['m']!!.map { it to process("in", Part(x, it, a, s)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
+//                    mm = max(m, mm)
+//                }
+//            }
+//        }
+//        println("m: $mm")
+//        count *= mm
+//
+//        var ma = 0L
+//        for (s in limits['s']!!) {
+//            for (x in limits['x']!!) {
+//                for (m in limits['m']!!) {
+//                    val a = (1..4000).count { process("in", Part(x, m, it, s)) != none }.toLong()
+////                    val a = limits['a']!!.map { it to process("in", Part(x, m, it, s)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
+//                    ma = max(a, ma)
+//                }
+//            }
+//        }
+//        println("a: $ma")
+//        count *= ma
+
+        return count
     }
 
     @Test
@@ -110,7 +223,7 @@ class Day19 {
 
     @Test
     fun testTwo(input: List<String>) {
-//        two(sample) shouldBe 0
+        two(sample) shouldBe 167409079868000L
 //        two(input) shouldBe 0
     }
 }
