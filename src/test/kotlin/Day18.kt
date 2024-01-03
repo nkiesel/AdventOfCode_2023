@@ -1,11 +1,7 @@
 import Direction.*
 import io.kotest.matchers.shouldBe
-import jdk.internal.org.jline.utils.Colors.h
 import org.junit.jupiter.api.Test
-import java.awt.Color
-import java.awt.image.BufferedImage
-import java.io.File
-import javax.imageio.ImageIO
+import kotlin.math.absoluteValue
 
 class Day18 {
     private val sample = """
@@ -53,67 +49,6 @@ class Day18 {
         }
     }
 
-    private fun displayTrench(
-        minX: Int,
-        maxX: Int,
-        minY: Int,
-        maxY: Int,
-        horizontals: MutableList<Line>,
-        verticals: MutableList<Line>
-    ) {
-        val area = CharArea(maxX - minX + 1, maxY - minY + 1, '.')
-        horizontals.forEach { h ->
-            var p = Point(h.start.x - minX, h.start.y - minY)
-            val end = Point(h.end.x - minX, h.end.y - minY)
-            area.set(p, '#')
-            do {
-                p = p.move(E)
-                area.set(p, '#')
-            } while (p != end)
-        }
-        verticals.forEach { h ->
-            var p = Point(h.start.x - minX, h.start.y - minY)
-            val end = Point(h.end.x - minX, h.end.y - minY)
-            do {
-                area.set(p, '#')
-                p = p.move(S)
-            } while (p != end)
-        }
-        area.show()
-    }
-
-    private fun displayTrenchImage(
-        name: String,
-        minX: Int,
-        maxX: Int,
-        minY: Int,
-        maxY: Int,
-        horizontals: MutableList<Line>,
-        verticals: MutableList<Line>
-    ) {
-        val area = BufferedImage(maxX - minX + 1, maxY - minY + 1, BufferedImage.TYPE_INT_RGB)
-        val red = Color.RED.rgb
-        horizontals.forEach { h ->
-            var p = Point(h.start.x - minX, h.start.y - minY)
-            val end = Point(h.end.x - minX, h.end.y - minY)
-            area.setRGB(p.x, p.y, red)
-            do {
-                p = p.move(E)
-                area.setRGB(p.x, p.y, red)
-            } while (p != end)
-        }
-        verticals.forEach { h ->
-            var p = Point(h.start.x - minX, h.start.y - minY)
-            val end = Point(h.end.x - minX, h.end.y - minY)
-            area.setRGB(p.x, p.y, red)
-            do {
-                p = p.move(S)
-                area.setRGB(p.x, p.y, red)
-            } while (p != end)
-        }
-        ImageIO.write(area, "BMP", File("$name.bmp"))
-    }
-
     private fun one(input: List<String>): Int {
         val instructions = parse(input)
         var t = Point(0, 0)
@@ -150,63 +85,15 @@ class Day18 {
         }
     }
 
-    data class Line(val start: Point, val end: Point)
-
-    private fun two(input: List<String>, part2: Boolean, name: String): Long {
+    private fun two(input: List<String>, part2: Boolean): Long {
         val instructions = if (part2) parse2(input) else parse(input)
-        if (part2) println(instructions.joinToString("\n"))
-        val verticals = mutableListOf<Line>()
-        val horizontals = mutableListOf<Line>()
-        var t = Point(0, 0)
-        for (i in instructions) {
-            val n = t.move(i.direction, i.meters)
-            when (i.direction) {
-                N -> verticals.add(Line(n, t))
-                S -> verticals.add(Line(t, n))
-                E -> horizontals.add(Line(t, n))
-                W -> horizontals.add(Line(n, t))
-            }
-            t = n
-        }
-
-        horizontals.sortBy { it.start.y }
-        verticals.sortBy { it.start.x }
-
-        val minX = horizontals.minOf { it.start.x }
-        val maxX = horizontals.maxOf { it.end.x }
-        val minY = verticals.minOf { it.start.y }
-        val maxY = verticals.maxOf { it.end.y }
-        val xRange = minX..maxX
-        val width = maxX - minX + 1
-        val height = maxY - minY + 1
-
-        displayTrenchImage(name, minX, maxX, minY, maxY, horizontals, verticals)
-
-        val vr = verticals.groupBy { it.start.x }
-
-        var count = 0L
-        println("size: $width * $height = ${width.toLong() * height}")
-
-        for (x in xRange) {
-            val h = horizontals.filter { x in it.start.x..it.end.x }
-            var cc = h.first().start.y - minY
-            var nextIsInside = cc > 0
-            h.zipWithNext().forEach { (l1, l2) ->
-                val v = vr[x]?.find { v -> v.start == l1.start || v.start == l1.end && v.end == l2.start || v.end == l2.end }
-                if (v == null) {
-                    if (!nextIsInside) {
-                        cc += l2.start.y - l1.start.y - 1
-                    }
-                    nextIsInside = !nextIsInside
-                }
-            }
-            cc += maxY - h.last().start.y
-            if (!part2) println("count for x $x: $cc")
-            count += cc
-        }
-        return (maxX - minX + 1).toLong() * (maxY - minY + 1) - count
+        val area = instructions
+            .runningFold(Point(0, 0)) { point, i -> point.move(i.direction, i.meters) }
+            .zipWithNext { p1, p2 -> (p2.x - p1.x) * p1.y.toLong() }
+            .sum().absoluteValue
+        val trenchLength = instructions.sumOf { it.meters }
+        return area + trenchLength / 2 + 1
     }
-
 
     @Test
     fun testOne(input: List<String>) {
@@ -216,10 +103,19 @@ class Day18 {
 
     @Test
     fun testTwo(input: List<String>) {
-        two(sample, false, "sample") shouldBe 62L
-        two(sample3, false, "sample3") shouldBe 41L
-        two(input, false, "input") shouldBe 48652L
-//        two(sample) shouldBe 952408144115L
-//        two(input) shouldBe 0
+        two(sample, false) shouldBe 62L
+        two(sample3, false) shouldBe 42L
+        two(input, false) shouldBe 48652L
+        two(sample, true) shouldBe 952408144115L
+        two(input, true) shouldBe 45757884535661L
     }
 }
+
+/*
+Could not solve part 2 without cheating. I spent quite some time trying a "ray tracing" approach (where I for every
+X coordinate use the crossed horizontal lines to decide if the next points are inside or outside), but could never
+handle all the corner cases correctly. Finally, I took a peek at the Slack channel, which suggested to use "Pick's theorem"
+to compute the number of "inside" points based on the trench length and the trenched area, and to compute the area itself
+using the "shoelace formula". Once I understood these, the actual code is very short: compute the list of points using
+"runningFold" and compute the area from the list.
+ */

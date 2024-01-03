@@ -28,42 +28,29 @@ class Day17 {
         999999999991
     """.trimIndent().lines()
 
-    data class Step(val p: Point, val from: Direction, val c: Int, val loss: Int) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is Step) return false
+    data class State(val p: Point, val from: Direction, val c: Int)
 
-            if (p != other.p) return false
-            if (from != other.from) return false
-            if (c != other.c) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = p.hashCode()
-            result = 31 * result + from.hashCode()
-            result = 31 * result + c
-            return result
-        }
+    data class Step(val state: State, val loss: Int) : Comparable<Step> {
+        override fun compareTo(other: Step) = loss - other.loss
     }
 
     private fun one(input: List<String>): Int {
         val area = CharArea(input)
         val start = Point(0, 0)
         val target = Point(area.xRange.last, area.yRange.last)
-        val seen = mutableSetOf<Step>()
-        val queue = PriorityQueue(compareBy<Step> { it.loss })
-        queue.add(Step(start, W, 0, 0))
-        val candidates = mutableListOf<Int>()
+        val seen = mutableSetOf<State>()
+        val queue = PriorityQueue<Step>()
+        queue.add(Step(State(start, W, 0), 0))
+        queue.add(Step(State(start, N, 0), 0))
         while (queue.isNotEmpty()) {
             val s = queue.remove()
-            if (s.p == target) {
+            if (s.state.p == target) {
                 return s.loss
             }
-            if (!seen.add(s)) continue
 
-            val possibleMove = when (s.from) {
+            if (!seen.add(s.state)) continue
+
+            val possibleMove = when (s.state.from) {
                 N -> listOf(S, E, W)
                 S -> listOf(N, E, W)
                 E -> listOf(W, N, S)
@@ -71,9 +58,9 @@ class Day17 {
             }
 
             for (move in possibleMove.withIndex()) {
-                val c = if (move.index == 0) s.c + 1 else 1
+                val c = if (move.index == 0) s.state.c + 1 else 1
                 if (c <= 3) {
-                    val point = s.p.move(move.value)
+                    val point = s.state.p.move(move.value)
                     if (point in area) {
                         val loss = s.loss + area.get(point).digitToInt()
                         val from = when (move.value) {
@@ -82,7 +69,7 @@ class Day17 {
                             E -> W
                             W -> E
                         }
-                        queue.add(Step(point, from, c, loss))
+                        queue.add(Step(State(point, from, c), loss))
                     }
                 }
             }
@@ -91,21 +78,24 @@ class Day17 {
     }
 
     private fun two(input: List<String>): Int {
+        return three(input, 4, 10)
+    }
+
+    private fun three(input: List<String>, minSameDirection: Int, maxSameDirection: Int): Int {
         val area = CharArea(input)
         val start = Point(0, 0)
         val target = Point(area.xRange.last, area.yRange.last)
-        val seen = mutableSetOf<Step>()
-        val queue = PriorityQueue(compareBy<Step> { it.loss })
-        queue.add(Step(start, W, 0, 0))
-        val candidates = mutableListOf<Int>()
+        val seen = mutableSetOf<State>()
+        val queue = PriorityQueue(listOf(W, N).map { Step(State(start, it, 0), 0) })
         while (queue.isNotEmpty()) {
-            val s = queue.remove()
-            if (s.p == target && s.c >= 4) {
-                return s.loss
+            val (state, loss) = queue.remove()
+            if (state.p == target && state.c >= minSameDirection) {
+                return loss
             }
-            if (!seen.add(s)) continue
+            if (!seen.add(state)) continue
 
-            val possibleMove = when (s.from) {
+            val possibleMove = when (state.from) {
+                // This must have the "straight" move as the first item for the `move.index == 0` tests below to work
                 N -> listOf(S, E, W)
                 S -> listOf(N, E, W)
                 E -> listOf(W, N, S)
@@ -113,35 +103,49 @@ class Day17 {
             }
 
             for (move in possibleMove.withIndex()) {
-                val c = if (move.index == 0) s.c + 1 else 1
-                if (c <= 10 && (move.index == 0 || s.c >= 4)) {
-                    val point = s.p.move(move.value)
+                val c = if (move.index == 0) state.c + 1 else 1
+                if (c <= maxSameDirection && (move.index == 0 || state.c >= minSameDirection)) {
+                    val point = state.p.move(move.value)
                     if (point in area) {
-                        val loss = s.loss + area.get(point).digitToInt()
                         val from = when (move.value) {
                             N -> S
                             S -> N
                             E -> W
                             W -> E
                         }
-                        queue.add(Step(point, from, c, loss))
+                        queue.add(Step(State(point, from, c), loss + area.get(point).digitToInt()))
                     }
                 }
             }
         }
-        error("")
+        error("no path")
     }
 
     @Test
     fun testOne(input: List<String>) {
         one(sample) shouldBe 102
         one(input) shouldBe 1065
+        three(input, 0, 3) shouldBe 1065
     }
 
     @Test
     fun testTwo(input: List<String>) {
         two(sample) shouldBe 94
         two(sample2) shouldBe 71
-        two(input) shouldBe 1256
+        two(input) shouldBe 1249
     }
 }
+
+/*
+Oh man, this took a long time for part 2.  The code worked with the sample input, but not the real input.  I finally
+cheated and looked ats some other solutions, and then realized that I only started from the West and not from West or
+North!  Just adding the 2nd state as starting step then worked.  I think some earlier map traversals said to only
+enter from the West, so that somehow stuck in my head.
+
+The 2 parts could easily be implemented using the same method, so added `three` after I finally got the 2nd gold star.
+The other change - after taking a peek at other solutions - was to break the overall state into 2 classes. This avoids
+overriding the `equals` and `hashCode` method to not consider the accumulated loss.
+
+One a bit awkward aspect of my solution is that I have the "from" as direction in the state, then have to change
+that into the reverse for my `move` call, and then reverse again for the new state.  But will keep it for now.
+ */

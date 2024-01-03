@@ -29,12 +29,12 @@ class Day22 {
     }
 
     private fun fall(bricks: List<Brick>, skip: Int): Pair<Int, List<Int>> {
-        val maxX = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.x }
-        val maxY = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.y }
-        val maxZ = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.z }
+        val maxX = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.x } + 1
+        val maxY = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.y } + 1
+        val maxZ = bricks.flatMap { listOf(it.s, it.e) }.maxOf { it.z } + 1
 
-        val stack = Array(maxZ + 1) { Array(maxY + 1) { IntArray(maxX + 1) } }
-        val top = Array(maxY + 1) { IntArray(maxX + 1) }
+        val stack = Array(maxZ) { Array(maxY) { IntArray(maxX) } }
+        val top = Array(maxY) { IntArray(maxX) }
 
         val removable = bricks.map { it.i }.toMutableSet()
         val zList = mutableListOf<Int>()
@@ -46,45 +46,43 @@ class Day22 {
             }
             when (b.dir) {
                 'x' -> {
-                    val y = b.s.y
                     val rx = b.s.x..b.e.x
+                    val y = b.s.y
                     val z = rx.maxOf { x -> top[y][x] } + 1
-                    val t = mutableSetOf<Int>()
+                    val t = mutableSetOf(0)
                     rx.forEach { x ->
                         stack[z][y][x] = b.i
                         t += stack[z - 1][y][x]
                         top[y][x] = z
                     }
                     zList += z
-                    t -= 0
-                    if (t.size == 1) removable -= t
+                    if (t.size == 2) removable -= t
                 }
 
                 'y' -> {
                     val x = b.s.x
                     val ry = b.s.y..b.e.y
                     val z = ry.maxOf { y -> top[y][x] } + 1
-                    val t = mutableSetOf<Int>()
+                    val t = mutableSetOf(0)
                     ry.forEach { y ->
                         stack[z][y][x] = b.i
                         t += stack[z - 1][y][x]
                         top[y][x] = z
                     }
                     zList += z
-                    t -= 0
-                    if (t.size == 1) removable -= t
+                    if (t.size == 2) removable -= t
                 }
 
                 'z' -> {
                     val x = b.s.x
                     val y = b.s.y
-                    val cz = b.e.z - b.s.z + 1
-                    val tz = top[y][x]
-                    val rz = tz + 1..tz + cz
+                    val cz = b.e.z - b.s.z
+                    val tz = top[y][x] + 1
+                    val rz = tz..tz + cz
                     rz.forEach { z -> stack[z][y][x] = b.i }
-                    zList += tz + 1
-                    removable -= stack[tz][y][x]
-                    top[y][x] += cz
+                    zList += tz
+                    removable -= stack[tz - 1][y][x]
+                    top[y][x] += cz + 1
                 }
             }
         }
@@ -117,3 +115,8 @@ class Day22 {
         two(input) shouldBe 61920
     }
 }
+
+/*
+Took a while, but at least did not require fancy caching.  The one mistake that cost me quite some time was to miss the
+`.sortedBy { it.s.z }`.
+*/

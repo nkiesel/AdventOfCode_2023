@@ -157,21 +157,31 @@ class Day19 {
         println(limits['a'])
         println(limits['s'])
 
-        var ms = 0L
-        for (x in limits['x']!!) {
-            for (m in limits['m']!!) {
-                for (a in limits['a']!!) {
-                    val s = (1..4000).count { process("in", Part(x, m, a, it)) != none }.toLong()
-//                    val s = limits['s']!!.map { it to process("in", Part(x, m, a, it)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
-                    if (x == 1 && m == 1800 && a == 4000) {
-                        println("s is $s")
-                    }
-                    ms = max(s, ms)
+        var bruteForce = 0L
+        for (x in 1..4000) {
+            for (m in 1..4000) {
+                for (a in 1..4000) {
+                    bruteForce += (1..4000).count { process("in", Part(x, m, a, it)) != none }.toLong()
                 }
             }
         }
-        println("s: $ms")
-        count = ms
+        return bruteForce
+
+//        var ms = 0L
+//        for (x in limits['x']!!) {
+//            for (m in limits['m']!!) {
+//                for (a in limits['a']!!) {
+//                    val s = (1..4000).count { process("in", Part(x, m, a, it)) != none }.toLong()
+////                    val s = limits['s']!!.map { it to process("in", Part(x, m, a, it)) }.zipWithNext().fold(0L) { acc, i -> if (i.second.second != none) acc + (i.second.first - i.first.first) else acc }
+//                    if (x == 1 && m == 1800 && a == 4000) {
+//                        println("s is $s")
+//                    }
+//                    ms = max(s, ms)
+//                }
+//            }
+//        }
+//        println("s: $ms")
+//        count = ms
 
 //        var mx =0L
 //        for (m in limits['m']!!) {
@@ -212,7 +222,7 @@ class Day19 {
 //        println("a: $ma")
 //        count *= ma
 
-        return count
+//        return count
     }
 
     @Test

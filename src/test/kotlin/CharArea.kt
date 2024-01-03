@@ -9,6 +9,9 @@ data class Point(val x: Int, val y: Int) {
     }
 
     fun move(dx: Int, dy: Int) = Point(x + dx, y + dy)
+
+    fun neighbors4() = listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
+        .map { (dx, dy) -> Point(x + dx, y + dy) }
 }
 
 class CharArea(private val area: Array<CharArray>) {
@@ -76,12 +79,9 @@ class CharArea(private val area: Array<CharArray>) {
         }
     }
 
-    fun neighbors4(x: Int, y: Int): List<Point> =
-        listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)
-            .map { (dx, dy) -> Point(x + dx, y + dy) }
-            .filter { valid(it) }
+    fun neighbors4(x: Int, y: Int): List<Point> = Point(x, y).neighbors4().filter { valid(it) }
 
-    fun neighbors4(p: Point): List<Point> = neighbors4(p.x, p.y)
+    fun neighbors4(p: Point): List<Point> = p.neighbors4().filter { valid(it) }
 
     fun show() {
         area.forEach { println(it) }
