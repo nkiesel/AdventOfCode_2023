@@ -31,8 +31,8 @@ class Day23 {
 
     private fun one(input: List<String>, slip: Boolean = true): Int {
         val area = CharArea(input)
-        val start = Point(area.xRange.first { area.get(it, 0) == '.' }, 0)
-        val finish = Point(area.xRange.first { area.get(it, area.yRange.last) == '.' }, area.yRange.last)
+        val start = Point(area.xRange.first { area[it, 0] == '.' }, 0)
+        val finish = Point(area.xRange.first { area[it, area.yRange.last] == '.' }, area.yRange.last)
         val seen = mutableSetOf(start)
         val queue = ArrayDeque(listOf(start to seen))
         var len = 0
@@ -44,7 +44,7 @@ class Day23 {
                 len = max(len, s.size)
             } else {
                 val next = (if (slip) {
-                    when (area.get(p)) {
+                    when (area[p]) {
                         '>' -> listOf(p.move(Direction.E))
                         '<' -> listOf(p.move(Direction.W))
                         '^' -> listOf(p.move(Direction.N))
@@ -53,7 +53,7 @@ class Day23 {
                     }
                 } else {
                     area.neighbors4(p)
-                }).filter { area.get(it) != '#' && it !in s }
+                }).filter { area[it] != '#' && it !in s }
                 for (b in next) {
                     val ss = if (next.size == 1) s else s.toMutableSet()
                     ss.add(b)
@@ -70,7 +70,7 @@ class Day23 {
         return buildMap {
             while (candidates.isNotEmpty()) {
                 val n = candidates.removeFirst()
-                for (c in area.neighbors4(n.value).filter { area.get(it) != '#' }) {
+                for (c in area.neighbors4(n.value).filter { area[it] != '#' }) {
                     if (c in neighbors && c != p) {
                         put(c, max(get(c) ?: 0, n.index + 1))
                     } else if (seen.add(c)) {
@@ -83,10 +83,10 @@ class Day23 {
 
     private fun two(input: List<String>): Int {
         val area = CharArea(input)
-        val start = Point(area.xRange.first { area.get(it, 0) == '.' }, 0)
-        val finish = Point(area.xRange.first { area.get(it, area.yRange.last) == '.' }, area.yRange.last)
+        val start = Point(area.xRange.first { area[it, 0] == '.' }, 0)
+        val finish = Point(area.xRange.first { area[it, area.yRange.last] == '.' }, area.yRange.last)
         val junctions =
-            area.tiles().filter { p -> area.get(p) != '#' && area.neighbors4(p).count { area.get(it) != '#' } > 2 }
+            area.tiles().filter { p -> area[p] != '#' && area.neighbors4(p).count { area[it] != '#' } > 2 }
                 .toSet() + start + finish
         val graph = junctions.associateWith { directNeighbors(it, area, junctions) }
 

@@ -60,7 +60,7 @@ class Day10 {
         val area = CharArea(input)
         val (sx, sy) = area.first('S')
         var d = Direction.entries.filter { area.valid(sx + it.x, sy + it.y) }.first { d ->
-            val p = area.get(sx + d.x, sy + d.y)
+            val p = area[sx + d.x, sy + d.y]
             when (d) {
                 N -> p in "|F7"
                 S -> p in "|JL"
@@ -75,7 +75,7 @@ class Day10 {
             steps++
             x += d.x
             y += d.y
-            d = when (area.get(x, y)) {
+            d = when (area[x, y]) {
                 'L' -> if (d == S) E else N
                 'J' -> if (d == S) W else N
                 '7' -> if (d == N) W else S
@@ -90,13 +90,13 @@ class Day10 {
         val area = CharArea(input[0].length * 3, input.size * 3, '.')
         for (y in input.indices) {
             for (x in input[0].indices) {
-                area.set(x * 3, y * 3, input[y][x])
+                area[x * 3, y * 3] = input[y][x]
             }
         }
 
         val (sx, sy) = area.first('S')
         var d = Direction.entries.filter { it.possible(sx, sy, area) }.first { d ->
-            val p = area.get(sx + d.x * 3, sy + d.y * 3)
+            val p = area[sx + d.x * 3, sy + d.y * 3]
             when (d) {
                 N -> p in "|F7"
                 S -> p in "|JL"
@@ -112,7 +112,7 @@ class Day10 {
             steps++
             buildList {
                 add(Point(x, y))
-                when (area.get(x, y)) {
+                when (area[x, y]) {
                     'S' -> when (d) {
                         N -> add(Point(x, y - 1))
                         S -> add(Point(x, y + 1))
@@ -127,10 +127,10 @@ class Day10 {
                     'F' -> addAll(listOf(Point(x + 1, y), Point(x, y + 1)))
                     'L' -> addAll(listOf(Point(x + 1, y), Point(x, y - 1)))
                 }
-            }.forEach { area.set(it, '#') }
+            }.forEach { area[it] = '#' }
             x += d.x * 3
             y += d.y * 3
-            d = when (area.get(x, y)) {
+            d = when (area[x, y]) {
                 'L' -> if (d == S) E else N
                 'J' -> if (d == S) W else N
                 '7' -> if (d == N) W else S
@@ -140,22 +140,22 @@ class Day10 {
         } while (x != sx || y != sy)
 
         when (d) {
-            N -> area.set(x, y + 1, '#')
-            S -> area.set(x, y - 1, '#')
-            E -> area.set(x - 1, y, '#')
-            W -> area.set(x + 1, y, '#')
+            N -> area[x, y + 1] = '#'
+            S -> area[x, y - 1] = '#'
+            E -> area[x - 1, y] = '#'
+            W -> area[x + 1, y] = '#'
         }
 
-        area.tiles().filter { area.get(it) != '#' }.forEach { area.set(it, '.') }
+        area.tiles().filter { area[it] != '#' }.forEach { area[it] = '.' }
 
         area.corners()
-            .filter { area.get(it) == '.' }
+            .filter { area[it] == '.' }
             .forEach { e ->
-                area.set(e, 'O')
-                bfs(e) { t -> area.neighbors4(t).filter { area.get(it) == '.' } }.forEach { area.set(it.value, 'O') }
+                area[e] = 'O'
+                bfs(e) { t -> area.neighbors4(t).filter { area[it] == '.' } }.forEach { area[it.value] = 'O' }
             }
 
-        return area.tiles().count { (x, y) -> x % 3 == 0 && y % 3 == 0 && area.get(x, y) == '.' }
+        return area.tiles().count { (x, y) -> x % 3 == 0 && y % 3 == 0 && area[x, y] == '.' }
     }
 
     @Test

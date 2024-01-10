@@ -23,9 +23,9 @@ class Day11 {
         val emptyCols = base.columns().withIndex().filter { l -> l.value.all { it == '.' } }.map { it.index }.toList()
         val area = CharArea(base.xRange.last + emptyCols.size + 1, base.yRange.last + emptyRows.size + 1, '.')
         base.tiles().forEach { (x, y) ->
-            area.set(x + emptyCols.count { it < x }, y + emptyRows.count { it < y }, base.get(x, y))
+            area[x + emptyCols.count { it < x }, y + emptyRows.count { it < y }] = base[x, y]
         }
-        val galaxies = area.filter { area.get(it) == '#' }
+        val galaxies = area.filter { area[it] == '#' }
         var sum = 0
         galaxies.forEachIndexed { index, g1 ->
             galaxies.drop(index + 1).forEach { g2 ->
@@ -40,7 +40,7 @@ class Day11 {
         val area = CharArea(input)
         val emptyRows = area.rows().withIndex().filter { l -> l.value.all { it == '.' } }.map { it.index }.toList()
         val emptyCols = area.columns().withIndex().filter { l -> l.value.all { it == '.' } }.map { it.index }.toList()
-        val galaxies = area.filter { area.get(it) == '#' }.toList()
+        val galaxies = area.filter { area[it] == '#' }.toList()
 
         return galaxies
             .flatMapIndexed { index, g -> galaxies.drop(index).map { g to it } }

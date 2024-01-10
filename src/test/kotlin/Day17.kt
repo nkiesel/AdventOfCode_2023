@@ -62,7 +62,7 @@ class Day17 {
                 if (c <= 3) {
                     val point = s.state.p.move(move.value)
                     if (point in area) {
-                        val loss = s.loss + area.get(point).digitToInt()
+                        val loss = s.loss + area[point].digitToInt()
                         val from = when (move.value) {
                             N -> S
                             S -> N
@@ -113,7 +113,7 @@ class Day17 {
                             E -> W
                             W -> E
                         }
-                        queue.add(Step(State(point, from, c), loss + area.get(point).digitToInt()))
+                        queue.add(Step(State(point, from, c), loss + area[point].digitToInt()))
                     }
                 }
             }

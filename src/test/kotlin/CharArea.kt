@@ -21,19 +21,19 @@ class CharArea(private val area: Array<CharArray>) {
     val xRange = area[0].indices
     val yRange = area.indices
 
-    fun get(x: Int, y: Int) = area[y][x]
+    operator fun get(x: Int, y: Int) = area[y][x]
 
     fun getOrNull(x: Int, y: Int) = if (valid(x, y)) get(x, y) else null
 
     fun getOrNull(p: Point) = if (valid(p)) get(p) else null
 
-    fun get(p: Point) = get(p.x, p.y)
+    operator fun get(p: Point) = get(p.x, p.y)
 
     fun valid(x: Int, y: Int) = x in xRange && y in yRange
 
     fun valid(p: Point) = valid(p.x, p.y)
 
-    fun set(x: Int, y: Int, c: Char) {
+    operator fun set(x: Int, y: Int, c: Char) {
         if (valid(x, y)) area[y][x] = c
     }
 
@@ -41,7 +41,7 @@ class CharArea(private val area: Array<CharArray>) {
         if (valid(x, y)) area[y][x] = c(area[y][x])
     }
 
-    fun set(p: Point, c: Char) {
+    operator fun set(p: Point, c: Char) {
         set(p.x, p.y, c)
     }
 
@@ -99,7 +99,7 @@ class CharArea(private val area: Array<CharArray>) {
 
     fun rotated(): CharArea {
         val inverted = CharArea(yRange.last + 1, xRange.last + 1, ' ')
-        tiles().forEach { (x, y) -> inverted.set(y, x, get(x, y)) }
+        tiles().forEach { (x, y) -> inverted[y, x] = get(x, y) }
         return inverted
     }
 

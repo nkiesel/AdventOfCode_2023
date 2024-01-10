@@ -20,7 +20,7 @@ class Day21 {
     private fun one(input: List<String>, steps: Int): Int {
         val area = CharArea(input)
         val start = area.first('S')
-        return bfs(start) { t -> area.neighbors4(t).filter { area.get(it) != '#' } }.takeWhile { it.index <= steps }
+        return bfs(start) { t -> area.neighbors4(t).filter { area[it] != '#' } }.takeWhile { it.index <= steps }
             .count { it.index % 2 == 0 }
 //        bfs(start) { t -> area.neighbors4(t).filter { area.get(it) != '#'} }.takeWhile { it.index <= 6 }.forEach { if (it.index %2 == 0) area.set(it.value, 'O') }
     }

@@ -46,17 +46,17 @@ class Day13 {
         val v = vertical(area)
         val h = vertical(rotated)
         area.tiles().forEach { (x, y) ->
-            val c = area.get(x, y)
+            val c = area[x, y]
             val o = if (c == '.') '#' else '.'
-            area.set(x, y, o)
-            rotated.set(y, x, o)
+            area[x, y] = o
+            rotated[y, x] = o
             val v1 = vertical(area, v)
             val h1 = vertical(rotated, h)
             if (v1 != 0 || h1 != 0) {
                 return v1 + h1 * 100
             }
-            area.set(x, y, c)
-            rotated.set(y, x, c)
+            area[x, y] = c
+            rotated[y, x] = c
         }
         error("no smudge")
     }

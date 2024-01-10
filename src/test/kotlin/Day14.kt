@@ -20,12 +20,12 @@ class Day14 {
         for (x in area.xRange) {
             val next = ArrayDeque<Int>()
             for (y in yRange) {
-                when (area.get(x, y)) {
+                when (area[x, y]) {
                     '.' -> next.addLast(y)
                     '#' -> next.clear()
                     'O' -> if (next.isNotEmpty()) {
-                        area.set(x, next.removeFirst(), 'O')
-                        area.set(x, y, '.')
+                        area[x, next.removeFirst()] = 'O'
+                        area[x, y] = '.'
                         next.addLast(y)
                     }
                 }
@@ -38,12 +38,12 @@ class Day14 {
         for (y in area.yRange) {
             val next = ArrayDeque<Int>()
             for (x in xRange) {
-                when (area.get(x, y)) {
+                when (area[x, y]) {
                     '.' -> next.addLast(x)
                     '#' -> next.clear()
                     'O' -> if (next.isNotEmpty()) {
-                        area.set(next.removeFirst(), y, 'O')
-                        area.set(x, y, '.')
+                        area[next.removeFirst(), y] = 'O'
+                        area[x, y] = '.'
                         next.addLast(x)
                     }
                 }
@@ -55,7 +55,7 @@ class Day14 {
         val area = CharArea(input)
         northSouth(area, true)
         val maxY = area.yRange.last + 1
-        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') maxY - y else 0 }
+        return area.tiles().sumOf { (x, y) -> if (area[x, y] == 'O') maxY - y else 0 }
     }
 
     private fun two(input: List<String>): Int {
@@ -83,7 +83,7 @@ class Day14 {
             }
         }
         val maxY = area.yRange.last + 1
-        return area.tiles().sumOf { (x, y) -> if (area.get(x, y) == 'O') maxY - y else 0 }
+        return area.tiles().sumOf { (x, y) -> if (area[x, y] == 'O') maxY - y else 0 }
     }
 
     @Test

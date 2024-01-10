@@ -29,7 +29,7 @@ class Day16 {
                     val p = beam.p.move(d)
                     if (p in area) {
                         energized += p
-                        when (area.get(p)) {
+                        when (area[p]) {
                             '\\' -> when (d) {
                                 N -> listOf(W)
                                 S -> listOf(E)
