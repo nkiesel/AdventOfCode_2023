@@ -1,9 +1,9 @@
 [versions]
 junit5 = "5.10.1"
 kotest = "5.8.0"
-plugin-versions = "0.50.0"
+plugin-versions = "0.51.0"
 plugin-versionsFilter = "0.1.16"
-plugin-versionsUpdate = "0.8.3"
+plugin-versionsUpdate = "0.8.4"
 serialization = "1.6.2"
 
 [libraries]
