@@ -1,6 +1,5 @@
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.util.*
 
 class Day21 {
     private val sample = """
