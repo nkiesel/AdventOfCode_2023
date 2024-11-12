@@ -22,13 +22,9 @@ class Day02 {
         two(input) shouldBe 71220
     }
 
-    class Reveal(val red: Int, val green: Int, val blue: Int) {
-        fun possible(game: Game) = game.reveals.all { it.red <= red && it.green <= green && it.blue <= blue }
-    }
+    class Reveal(val red: Int, val green: Int, val blue: Int)
 
-    class Game(val id: Int, val reveals: List<Reveal>) {
-        fun power() = reveals.maxOf { it.red } * reveals.maxOf { it.green } * reveals.maxOf { it.blue }
-    }
+    class Game(val id: Int, val reveals: List<Reveal>)
 
     private fun parse(input: List<String>): List<Game> {
         val red = Regex("""(\d+) red""")
@@ -37,7 +33,7 @@ class Day02 {
         fun cubes(line: String, re: Regex) = re.find(line)?.groupValues?.get(1)?.toInt() ?: 0
 
         return input.map { line ->
-            val record = line.split(";", ":")
+            val record = line.split(";", ":").toMutableList()
             val id = record.removeFirst().substringAfter(" ").toInt()
             val reveals = record.map {
                 Reveal(red = cubes(it, red), green = cubes(it, green), blue = cubes(it, blue))
@@ -47,12 +43,11 @@ class Day02 {
     }
 
     private fun one(input: List<String>): Int {
-        val limit = Reveal(red = 12, green = 13, blue = 14)
-        return parse(input).filter { limit.possible(it) }.sumOf { it.id }
+        return parse(input).filter { it.reveals.all { it.red <= 12 && it.green <= 13 && it.blue <= 14 } }.sumOf { it.id }
     }
 
     private fun two(input: List<String>): Int {
-        return parse(input).sumOf { it.power() }
+        return parse(input).sumOf { with(it.reveals) { maxOf { it.red } * maxOf { it.green } * maxOf { it.blue } } }
     }
 }
 
